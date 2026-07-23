@@ -11,6 +11,11 @@
     scroll-behavior: smooth;
   }
 
+  /* Compensa el navbar fijo (h-16) al navegar por anclas (#nosotros, etc.) */
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+
   body {
     @apply bg-sand-50 font-sans text-stone-900 antialiased;
     text-rendering: optimizeLegibility;

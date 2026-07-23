@@ -82,7 +82,7 @@ export function ComparativaSection() {
               className="grid grid-cols-1 border-t border-sand-200 sm:grid-cols-[1.4fr_1fr_1fr]"
             >
               {/* beneficio */}
-              <div className="flex items-center gap-3 px-6 py-5">
+              <div className="flex items-center gap-3 px-6 pb-2 pt-5 sm:py-5">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white">
                   <Icon size={16} />
                 </span>
@@ -90,23 +90,27 @@ export function ComparativaSection() {
               </div>
 
               {/* firma tradicional */}
-              <div className="flex items-start gap-2 px-6 pb-5 pt-0 sm:items-center sm:py-5">
-                <span className="mb-1 block w-full text-xs font-semibold uppercase tracking-widest text-stone-500 sm:hidden">
+              <div className="px-6 pb-4 sm:flex sm:items-center sm:py-5">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-widest text-stone-500 sm:hidden">
                   Firma tradicional
                 </span>
-                <X size={16} className="mt-0.5 shrink-0 text-stone-300 sm:mt-0" />
-                <span className="text-sm font-normal text-stone-400 line-through decoration-stone-300">
-                  {traditional}
+                <span className="flex items-start gap-2">
+                  <X size={16} className="mt-0.5 shrink-0 text-stone-300" />
+                  <span className="text-sm font-normal text-stone-400 line-through decoration-stone-300">
+                    {traditional}
+                  </span>
                 </span>
               </div>
 
               {/* juristech */}
-              <div className="flex items-start gap-2 bg-brand-50 px-6 pb-5 pt-0 sm:items-center sm:py-5">
-                <span className="mb-1 block w-full text-xs font-semibold uppercase tracking-widest text-brand-700 sm:hidden">
+              <div className="bg-brand-50 px-6 pb-5 pt-4 sm:flex sm:items-center sm:py-5 sm:pt-5">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-widest text-brand-700 sm:hidden">
                   JurisTech
                 </span>
-                <Check size={16} className="mt-0.5 shrink-0 text-brand-600 sm:mt-0" />
-                <span className="text-sm font-medium text-stone-800">{juristech}</span>
+                <span className="flex items-start gap-2">
+                  <Check size={16} className="mt-0.5 shrink-0 text-brand-600" />
+                  <span className="text-sm font-medium text-stone-800">{juristech}</span>
+                </span>
               </div>
             </motion.div>
           ))}

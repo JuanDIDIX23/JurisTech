@@ -64,7 +64,7 @@ export function HeroSection() {
     <section
       id="inicio"
       aria-label="Presentación de JurisTech"
-      className="relative h-screen min-h-[640px] w-full overflow-hidden bg-brand-950"
+      className="relative flex min-h-screen w-full flex-col overflow-hidden bg-brand-950"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -92,8 +92,8 @@ export function HeroSection() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-transparent" />
 
       {/* contenido */}
-      <div className="relative z-10 flex h-full flex-col">
-        <div className="flex flex-1 items-center">
+      <div className="relative z-10 flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col justify-center pt-24 sm:pt-20">
           <div className="container-page w-full">
             <motion.div
               variants={staggerContainer}

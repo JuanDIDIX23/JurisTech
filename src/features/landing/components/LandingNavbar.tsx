@@ -23,18 +23,20 @@ export function LandingNavbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Fondo sólido (blanco) cuando hay scroll o el menú móvil está abierto;
+  // de lo contrario es transparente sobre el hero oscuro y usa texto claro.
+  const solid = scrolled || open;
+
   return (
     <header
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-all duration-300',
-        scrolled
-          ? 'border-b border-sand-200 bg-white/80 backdrop-blur-xl'
-          : 'border-b border-transparent',
+        solid ? 'border-b border-sand-200 bg-white/80 backdrop-blur-xl' : 'border-b border-transparent',
       )}
     >
       <nav className="container-page flex h-16 items-center justify-between">
         <Link to={ROUTES.home} className="shrink-0">
-          <Logo />
+          <Logo tone={solid ? 'dark' : 'light'} />
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
@@ -42,7 +44,12 @@ export function LandingNavbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-stone-600 transition-colors hover:text-stone-900"
+              className={cn(
+                'text-sm font-medium transition-colors',
+                solid
+                  ? 'text-stone-600 hover:text-stone-900'
+                  : 'text-white/85 hover:text-white',
+              )}
             >
               {link.label}
             </a>
@@ -51,7 +58,11 @@ export function LandingNavbar() {
 
         <div className="hidden items-center gap-3 md:flex">
           <Link to={ROUTES.dashboard}>
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(!solid && '!text-white hover:!bg-white/10')}
+            >
               Iniciar sesión
             </Button>
           </Link>
@@ -63,9 +74,13 @@ export function LandingNavbar() {
         </div>
 
         <button
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-stone-700 md:hidden"
+          className={cn(
+            'inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors md:hidden',
+            solid ? 'text-stone-700' : 'text-white',
+          )}
           onClick={() => setOpen((v) => !v)}
           aria-label="Menú"
+          aria-expanded={open}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -84,7 +99,7 @@ export function LandingNavbar() {
                 {link.label}
               </a>
             ))}
-            <Link to={ROUTES.dashboard} className="mt-2">
+            <Link to={ROUTES.dashboard} className="mt-2" onClick={() => setOpen(false)}>
               <Button className="w-full" rightIcon={<ArrowRight size={16} />}>
                 Empezar ahora
               </Button>
