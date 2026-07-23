@@ -2,7 +2,7 @@
 
 export const ROUTES = {
   home: '/',
-  // Dashboard (área privada del cliente)
+  // Dashboard (área privada del afiliado)
   dashboard: '/app',
   documents: '/app/documentos',
   tokens: '/app/tokens',

@@ -11,6 +11,11 @@ interface FaqItem {
 
 const FAQS: FaqItem[] = [
   {
+    question: '¿Qué significa ser afiliado de JurisTech?',
+    answer:
+      'Ser afiliado significa formar parte de nuestra comunidad de pymes que acceden a servicios jurídicos preventivos y remotos mediante tokens, sin contratos de permanencia ni honorarios fijos.',
+  },
+  {
     question: '¿Qué es exactamente un token?',
     answer:
       'Un token es una unidad de trabajo jurídico. Cada solicitud tiene un coste estimado en tokens que conoces antes de confirmarla, de modo que pagas exactamente por el trabajo que necesitas.',
@@ -18,7 +23,7 @@ const FAQS: FaqItem[] = [
   {
     question: '¿Los tokens caducan?',
     answer:
-      'Los tokens incluidos en tu plan se mantienen disponibles mientras tu suscripción esté activa. Además, recibes bonificaciones por renovación anual.',
+      'Los tokens incluidos en tu plan se mantienen disponibles mientras tu afiliación esté activa. Además, recibes bonificaciones por renovación anual.',
   },
   {
     question: '¿Qué pasa si cancelo una solicitud?',

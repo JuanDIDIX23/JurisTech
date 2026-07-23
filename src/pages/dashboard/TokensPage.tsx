@@ -157,7 +157,7 @@ function RadialGauge({ percent }: { percent: number }) {
   return (
     <div className="relative h-40 w-40">
       <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
-        <circle cx="70" cy="70" r={r} fill="none" stroke="#eceef2" strokeWidth="12" />
+        <circle cx="70" cy="70" r={r} fill="none" className="stroke-graphite-100" strokeWidth="12" />
         <circle
           cx="70"
           cy="70"

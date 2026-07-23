@@ -6,11 +6,11 @@ import type {
 } from '@shared/types';
 
 export const REQUEST_STATUS_LABELS: Record<RequestStatus, string> = {
-  pending: 'Pendiente',
+  pending: 'Recibida',
   in_review: 'En revisión',
-  in_progress: 'En progreso',
-  completed: 'Completada',
-  cancelled: 'Cancelada',
+  in_progress: 'En proceso',
+  completed: 'Entregada',
+  cancelled: 'Cerrada',
 };
 
 // Tono de cada estado para badges (clases tailwind).

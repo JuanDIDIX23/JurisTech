@@ -5,15 +5,30 @@ import { ROUTES } from '@app/routes';
 const COLUMNS = [
   {
     title: 'Producto',
-    links: ['Beneficios', 'Tokens', 'Servicios', 'Seguridad'],
+    links: [
+      { label: 'Diferenciación', href: '#beneficios' },
+      { label: 'Tokens', href: '#tokens' },
+      { label: 'Servicios', href: '#servicios' },
+      { label: 'Preguntas frecuentes', href: '#faq' },
+    ],
   },
   {
     title: 'Empresa',
-    links: ['Sobre nosotros', 'Clientes', 'Blog', 'Contacto'],
+    links: [
+      { label: 'Sobre nosotros', href: '#beneficios' },
+      { label: 'Afiliados', href: '#faq' },
+      { label: 'Blog', href: '#' },
+      { label: 'Contacto', href: '#contacto' },
+    ],
   },
   {
     title: 'Legal',
-    links: ['Privacidad', 'Términos', 'Cookies', 'RGPD'],
+    links: [
+      { label: 'Privacidad', href: '#' },
+      { label: 'Términos', href: '#' },
+      { label: 'Cookies', href: '#' },
+      { label: 'Habeas Data', href: '#' },
+    ],
   },
 ];
 
@@ -25,8 +40,8 @@ export function LandingFooter() {
           <div className="lg:col-span-2">
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-graphite-500">
-              Asesoría jurídica inteligente para empresas modernas. Tokens flexibles y gestión
-              documental en una sola plataforma.
+              Derecho, innovación y confianza para tu empresa. Plataforma de afiliación jurídica
+              para pymes con tokens flexibles y atención remota.
             </p>
           </div>
 
@@ -35,12 +50,12 @@ export function LandingFooter() {
               <h4 className="text-sm font-semibold text-navy-900">{col.title}</h4>
               <ul className="mt-4 space-y-3">
                 {col.links.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <a
-                      href="#"
+                      href={link.href}
                       className="text-sm text-graphite-500 transition-colors hover:text-accent-600"
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}

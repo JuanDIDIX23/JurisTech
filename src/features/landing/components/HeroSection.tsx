@@ -1,9 +1,7 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, ShieldCheck } from 'lucide-react';
 import { Button } from '@shared/ui';
 import { fadeUp, staggerContainer } from '@shared/lib/motion';
-import { ROUTES } from '@app/routes';
 import { DashboardMockup } from './DashboardMockup';
 
 export function HeroSection() {
@@ -21,7 +19,7 @@ export function HeroSection() {
           <motion.div variants={fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-accent-200 backdrop-blur">
               <Sparkles size={14} />
-              Plataforma legal impulsada por tecnología
+              Innovación jurídica para pymes colombianas
             </span>
           </motion.div>
 
@@ -29,34 +27,35 @@ export function HeroSection() {
             variants={fadeUp}
             className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]"
           >
-            Asesoría jurídica{' '}
+            Recupera el{' '}
             <span className="bg-gradient-to-r from-accent-300 to-accent-500 bg-clip-text text-transparent">
-              inteligente
+              control
             </span>{' '}
-            para empresas modernas
+            de tu inversión legal
           </motion.h1>
 
           <motion.p
             variants={fadeUp}
             className="mt-6 max-w-xl text-lg leading-relaxed text-graphite-300"
           >
-            Accede a asesoría jurídica especializada mediante un sistema flexible de tokens y
-            gestiona toda tu documentación desde una sola plataforma.
+            Olvídate de los honorarios fijos y el cobro por horas sin explicación. JurisTech es la
+            plataforma tecnológica que te da acceso a asesoría jurídica especializada mediante
+            tokens: conoces el costo antes de empezar y decides cuándo usarla.
           </motion.p>
 
           <motion.div variants={fadeUp} className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link to={ROUTES.dashboard}>
+            <a href="#contacto">
               <Button size="lg" rightIcon={<ArrowRight size={18} />} className="w-full sm:w-auto">
-                Acceder a la plataforma
+                Agenda una asesoría
               </Button>
-            </Link>
+            </a>
             <a href="#tokens">
               <Button
                 size="lg"
                 variant="outline"
                 className="w-full border-white/15 bg-white/5 text-white hover:bg-white/10 sm:w-auto"
               >
-                Ver cómo funciona
+                Conoce nuestro modelo
               </Button>
             </a>
           </motion.div>
@@ -67,10 +66,10 @@ export function HeroSection() {
           >
             <span className="inline-flex items-center gap-2">
               <ShieldCheck size={16} className="text-accent-300" />
-              Confidencialidad garantizada
+              Confianza y confidencialidad garantizadas
             </span>
             <span className="hidden h-4 w-px bg-white/10 sm:block" />
-            <span>+120 empresas confían en JurisTech</span>
+            <span>+120 pymes ya confían en JurisTech</span>
           </motion.div>
         </motion.div>
 

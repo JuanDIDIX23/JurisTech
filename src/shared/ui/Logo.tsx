@@ -14,11 +14,11 @@ export function Logo({ className, tone = 'dark', withWordmark = true }: LogoProp
         <svg width="18" height="18" viewBox="0 0 32 32" fill="none" aria-hidden>
           <path
             d="M9 9h14M16 9v11a4 4 0 0 1-4 4"
-            stroke="#3b8bff"
+            className="stroke-accent-400"
             strokeWidth="2.6"
             strokeLinecap="round"
           />
-          <circle cx="22" cy="20" r="2.4" fill="#7eb6ff" />
+          <circle cx="22" cy="20" r="2.4" className="fill-accent-300" />
         </svg>
       </span>
       {withWordmark && (

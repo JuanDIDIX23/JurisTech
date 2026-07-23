@@ -1,5 +1,16 @@
 import { motion } from 'framer-motion';
-import { Wallet, Send, FileCheck, Check } from 'lucide-react';
+import {
+  Wallet,
+  Send,
+  FileCheck,
+  Check,
+  Clock,
+  Layers,
+  Zap,
+  ShieldCheck,
+  TrendingUp,
+  Target,
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { SectionHeading } from './SectionHeading';
 import { fadeUp, staggerContainer } from '@shared/lib/motion';
@@ -33,6 +44,20 @@ const STEPS: Step[] = [
     description:
       'Un especialista resuelve tu caso y el entregable queda disponible en tu gestor documental.',
   },
+];
+
+interface Factor {
+  icon: LucideIcon;
+  label: string;
+}
+
+const FACTORS: Factor[] = [
+  { icon: Clock, label: 'Tiempo' },
+  { icon: Layers, label: 'Complejidad' },
+  { icon: Zap, label: 'Urgencia' },
+  { icon: ShieldCheck, label: 'Responsabilidad' },
+  { icon: TrendingUp, label: 'Impacto económico' },
+  { icon: Target, label: 'Valor estratégico' },
 ];
 
 const INCLUDES = [
@@ -69,16 +94,51 @@ export function TokensSection() {
             <motion.div
               key={step}
               variants={fadeUp}
-              className="relative rounded-2xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur"
+              className="relative rounded-2xl border border-navy-400/40 bg-navy-800/50 p-7 backdrop-blur"
             >
-              <span className="absolute right-6 top-6 text-5xl font-bold text-white/5">{step}</span>
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-600/20 text-accent-300">
+              <span className="absolute right-6 top-6 text-5xl font-bold text-accent-400/30">
+                {step}
+              </span>
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/20 text-accent-400">
                 <Icon size={22} />
               </span>
               <h3 className="mt-6 text-lg font-semibold text-white">{title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-graphite-400">{description}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-navy-100">{description}</p>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* qué determina el valor de un token */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="mt-10 rounded-2xl border border-navy-400/40 bg-navy-800/50 p-7"
+        >
+          <h3 className="text-center text-base font-semibold text-white">
+            ¿Qué determina el valor de un token?
+          </h3>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {FACTORS.map(({ icon: Icon, label }) => (
+              <motion.div
+                key={label}
+                variants={fadeUp}
+                className="flex items-center gap-3 rounded-xl border border-navy-400/40 bg-navy-800/50 px-4 py-3"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-500/20 text-accent-400">
+                  <Icon size={16} />
+                </span>
+                <span className="text-sm font-medium text-navy-100">{label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
         </motion.div>
 
         {/* franja de inclusiones */}
@@ -87,14 +147,14 @@ export function TokensSection() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="mt-10 grid gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="mt-6 grid gap-4 rounded-2xl border border-navy-400/40 bg-navy-800/50 p-6 sm:grid-cols-2 lg:grid-cols-4"
         >
           {INCLUDES.map((item) => (
             <div key={item} className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-accent-300">
+              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-accent-400">
                 <Check size={13} />
               </span>
-              <span className="text-sm text-graphite-300">{item}</span>
+              <span className="text-sm text-navy-100">{item}</span>
             </div>
           ))}
         </motion.div>

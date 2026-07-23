@@ -1,12 +1,12 @@
 // Utilidades de formato centralizadas (i18n-ready).
 
-const LOCALE = 'es-ES';
+const LOCALE = 'es-CO';
 
 export function formatNumber(value: number): string {
   return new Intl.NumberFormat(LOCALE).format(value);
 }
 
-export function formatCurrency(value: number, currency = 'EUR'): string {
+export function formatCurrency(value: number, currency = 'COP'): string {
   return new Intl.NumberFormat(LOCALE, {
     style: 'currency',
     currency,
@@ -17,7 +17,7 @@ export function formatCurrency(value: number, currency = 'EUR'): string {
 export function formatDate(iso: string): string {
   return new Intl.DateTimeFormat(LOCALE, {
     day: '2-digit',
-    month: 'short',
+    month: '2-digit',
     year: 'numeric',
   }).format(new Date(iso));
 }
@@ -25,7 +25,8 @@ export function formatDate(iso: string): string {
 export function formatDateTime(iso: string): string {
   return new Intl.DateTimeFormat(LOCALE, {
     day: '2-digit',
-    month: 'short',
+    month: '2-digit',
+    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(iso));

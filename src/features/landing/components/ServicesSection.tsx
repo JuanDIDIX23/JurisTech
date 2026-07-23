@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Building2, Users, Receipt, ScrollText, Lightbulb, DatabaseZap, ArrowUpRight } from 'lucide-react';
+import { Users, Umbrella, FileSignature, Briefcase, ArrowUpRight } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { SectionHeading } from './SectionHeading';
 import { fadeUp, staggerContainer } from '@shared/lib/motion';
@@ -13,40 +13,31 @@ interface Service {
 
 const SERVICES: Service[] = [
   {
-    icon: Building2,
-    title: 'Derecho mercantil',
-    description: 'Constitución, pactos de socios, contratos comerciales y operaciones societarias.',
-    tokens: 'desde 15 tokens',
-  },
-  {
     icon: Users,
-    title: 'Derecho laboral',
-    description: 'Contratación, despidos, políticas internas y auditoría de relaciones laborales.',
+    title: 'Derecho Laboral',
+    description:
+      'Contratación, liquidaciones, políticas internas y acompañamiento en relaciones laborales.',
     tokens: 'desde 12 tokens',
   },
   {
-    icon: Receipt,
-    title: 'Asesoría fiscal',
-    description: 'Planificación tributaria, revisión de obligaciones y optimización fiscal.',
+    icon: Umbrella,
+    title: 'Seguridad Social',
+    description:
+      'Afiliaciones, aportes, riesgos laborales y cumplimiento ante el sistema de seguridad social.',
+    tokens: 'desde 10 tokens',
+  },
+  {
+    icon: FileSignature,
+    title: 'Derecho Contractual',
+    description: 'Redacción, revisión y negociación de contratos comerciales y civiles.',
+    tokens: 'desde 15 tokens',
+  },
+  {
+    icon: Briefcase,
+    title: 'Consultoría Empresarial',
+    description:
+      'Estructuración societaria, cumplimiento normativo y asesoría estratégica para tu operación.',
     tokens: 'desde 18 tokens',
-  },
-  {
-    icon: ScrollText,
-    title: 'Compliance',
-    description: 'Programas de cumplimiento, prevención de riesgos penales y código ético.',
-    tokens: 'desde 20 tokens',
-  },
-  {
-    icon: Lightbulb,
-    title: 'Propiedad intelectual',
-    description: 'Registro de marcas, protección de software y acuerdos de licencia.',
-    tokens: 'desde 16 tokens',
-  },
-  {
-    icon: DatabaseZap,
-    title: 'Protección de datos',
-    description: 'Cumplimiento RGPD, evaluaciones de impacto y políticas de privacidad.',
-    tokens: 'desde 14 tokens',
   },
 ];
 
@@ -56,8 +47,8 @@ export function ServicesSection() {
       <div className="container-page">
         <SectionHeading
           eyebrow="Servicios"
-          title="Cobertura jurídica para cada necesidad"
-          description="Seis áreas de especialización con equipos dedicados. Una sola plataforma para gestionarlas todas."
+          title="Cuatro áreas, un mismo estándar de calidad"
+          description="Los servicios jurídicos que más necesita tu pyme, con especialistas dedicados y tokens transparentes."
         />
 
         <motion.div
@@ -65,7 +56,7 @@ export function ServicesSection() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: '-60px' }}
-          className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          className="mx-auto mt-16 grid max-w-4xl gap-6 sm:grid-cols-2"
         >
           {SERVICES.map(({ icon: Icon, title, description, tokens }) => (
             <motion.div

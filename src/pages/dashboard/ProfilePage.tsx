@@ -60,7 +60,7 @@ export default function ProfilePage() {
           <CardBody>
             <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
               <Field icon={Building2} label="Razón social" value={company.legalName} />
-              <Field icon={Hash} label="CIF / NIF" value={company.taxId} />
+              <Field icon={Hash} label="NIT" value={company.taxId} />
               <Field icon={Briefcase} label="Sector" value={company.industry} />
               <Field icon={Mail} label="Email" value={company.email} />
               <Field icon={Phone} label="Teléfono" value={company.phone} />
