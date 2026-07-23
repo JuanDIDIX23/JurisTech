@@ -13,16 +13,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/60 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-accent-600 text-white shadow-sm hover:bg-accent-500 active:bg-accent-700 shadow-[0_8px_24px_-10px_rgba(10,85,245,0.7)]',
-  secondary: 'bg-navy-900 text-white hover:bg-navy-800 active:bg-navy-950',
+    'bg-brand-600 text-white shadow-sm hover:bg-brand-500 active:bg-brand-700 shadow-[0_8px_24px_-10px_rgba(37,112,232,0.7)]',
+  secondary: 'bg-stone-900 text-white hover:bg-stone-800 active:bg-stone-950',
   outline:
-    'border border-graphite-200 bg-white text-graphite-800 hover:border-graphite-300 hover:bg-graphite-50',
-  ghost: 'text-graphite-700 hover:bg-graphite-100',
-  subtle: 'bg-accent-50 text-accent-700 hover:bg-accent-100',
+    'border border-sand-200 bg-white text-stone-800 hover:border-sand-300 hover:bg-sand-50',
+  ghost: 'text-stone-700 hover:bg-sand-100',
+  subtle: 'bg-brand-50 text-brand-700 hover:bg-brand-100',
 };
 
 const sizes: Record<Size, string> = {

@@ -59,7 +59,7 @@ export function FaqSection() {
           description="¿No encuentras tu respuesta? Escríbenos y te ayudamos encantados."
         />
 
-        <div className="mx-auto mt-14 max-w-3xl divide-y divide-graphite-200/80 border-y border-graphite-200/80">
+        <div className="mx-auto mt-14 max-w-3xl divide-y divide-sand-200 border-y border-sand-200">
           {FAQS.map((faq, i) => {
             const isOpen = open === i;
             return (
@@ -68,11 +68,11 @@ export function FaqSection() {
                   onClick={() => setOpen(isOpen ? null : i)}
                   className="flex w-full items-center justify-between gap-4 py-5 text-left"
                 >
-                  <span className="text-[16px] font-semibold text-navy-900">{faq.question}</span>
+                  <span className="text-base font-semibold text-stone-900">{faq.question}</span>
                   <span
                     className={cn(
-                      'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-graphite-200 text-graphite-500 transition-all duration-300',
-                      isOpen && 'rotate-45 border-accent-300 bg-accent-50 text-accent-600',
+                      'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-sand-200 text-stone-500 transition-all duration-300',
+                      isOpen && 'rotate-45 border-brand-300 bg-brand-50 text-brand-600',
                     )}
                   >
                     <Plus size={16} />
@@ -87,7 +87,7 @@ export function FaqSection() {
                       transition={{ duration: 0.3, ease: 'easeInOut' }}
                       className="overflow-hidden"
                     >
-                      <p className="pb-5 pr-10 text-[15px] leading-relaxed text-graphite-500">
+                      <p className="pb-5 pr-10 text-base font-normal leading-relaxed text-stone-500">
                         {faq.answer}
                       </p>
                     </motion.div>

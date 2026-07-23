@@ -16,7 +16,7 @@ export function Badge({ children, className, dot }: BadgeProps) {
     <span
       className={cn(
         'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset',
-        'bg-graphite-100 text-graphite-700 ring-graphite-200',
+        'bg-sand-100 text-stone-700 ring-sand-200',
         className,
       )}
     >

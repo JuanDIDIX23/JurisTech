@@ -174,7 +174,7 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
           transition={{ duration: 0.2 }}
         >
           <motion.div
-            className="absolute inset-0 bg-navy-950/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-stone-950/70 backdrop-blur-sm"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -190,17 +190,17 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
             transition={{ duration: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
           >
-            <div className="flex items-center justify-between border-b border-graphite-200/70 px-6 py-5">
+            <div className="flex items-center justify-between border-b border-sand-200 px-6 py-5">
               <div>
-                <h3 className="text-lg font-bold text-navy-900">Agenda una asesoría</h3>
-                <p className="text-sm text-graphite-500">
+                <h3 className="text-lg font-bold text-stone-900">Agenda una asesoría</h3>
+                <p className="text-sm text-stone-500">
                   Elige fecha, hora y cuéntanos un poco de tu empresa.
                 </p>
               </div>
               <button
                 onClick={onClose}
                 aria-label="Cerrar"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-graphite-400 transition-colors hover:bg-graphite-100 hover:text-navy-900"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-stone-400 transition-colors hover:bg-sand-100 hover:text-stone-900"
               >
                 <X size={18} />
               </button>
@@ -212,10 +212,10 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                     <CheckCircle2 size={28} />
                   </span>
-                  <h4 className="mt-5 text-lg font-semibold text-navy-900">
+                  <h4 className="mt-5 text-lg font-semibold text-stone-900">
                     ¡Listo, {name.split(' ')[0]}!
                   </h4>
-                  <p className="mt-2 max-w-sm text-sm leading-relaxed text-graphite-500">
+                  <p className="mt-2 max-w-sm text-sm leading-relaxed text-stone-500">
                     Abrimos tu cliente de correo con los datos de tu cita del{' '}
                     {selectedDate && DAY_FORMATTER.format(selectedDate)} a las {selectedTime}. Solo
                     confirma el envío y te contactaremos para validar el espacio.
@@ -228,11 +228,11 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                 <form onSubmit={handleSubmit} className="space-y-7">
                   {/* paso 1: calendario */}
                   <div>
-                    <h4 className="flex items-center gap-2 text-sm font-semibold text-navy-900">
-                      <CalendarDays size={16} className="text-accent-600" />
+                    <h4 className="flex items-center gap-2 text-sm font-semibold text-stone-900">
+                      <CalendarDays size={16} className="text-brand-600" />
                       1. Elige una fecha
                     </h4>
-                    <div className="mt-3 rounded-2xl border border-graphite-200/70 p-4">
+                    <div className="mt-3 rounded-2xl border border-sand-200 p-4">
                       <div className="flex items-center justify-between">
                         <button
                           type="button"
@@ -240,11 +240,11 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                           onClick={() =>
                             setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-graphite-500 transition-colors hover:bg-graphite-100 disabled:cursor-not-allowed disabled:opacity-30"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-sand-100 disabled:cursor-not-allowed disabled:opacity-30"
                         >
                           <ChevronLeft size={16} />
                         </button>
-                        <span className="text-sm font-semibold capitalize text-navy-900">
+                        <span className="text-sm font-semibold capitalize text-stone-900">
                           {MONTH_FORMATTER.format(viewMonth)}
                         </span>
                         <button
@@ -253,13 +253,13 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                           onClick={() =>
                             setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-graphite-500 transition-colors hover:bg-graphite-100 disabled:cursor-not-allowed disabled:opacity-30"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-sand-100 disabled:cursor-not-allowed disabled:opacity-30"
                         >
                           <ChevronRight size={16} />
                         </button>
                       </div>
 
-                      <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-medium text-graphite-400">
+                      <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-medium text-stone-400">
                         {WEEKDAY_HEADERS.map((d) => (
                           <span key={d}>{d}</span>
                         ))}
@@ -278,9 +278,9 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                               onClick={() => handleSelectDate(date)}
                               className={cn(
                                 'flex h-9 w-9 items-center justify-center rounded-lg text-sm transition-colors',
-                                !available && 'cursor-not-allowed text-graphite-300',
-                                available && !isSelected && 'text-navy-900 hover:bg-accent-50 hover:text-accent-700',
-                                isSelected && 'bg-accent-600 font-semibold text-white',
+                                !available && 'cursor-not-allowed text-stone-300',
+                                available && !isSelected && 'text-stone-900 hover:bg-brand-50 hover:text-brand-700',
+                                isSelected && 'bg-brand-600 font-semibold text-white',
                               )}
                             >
                               {date.getDate()}
@@ -293,8 +293,8 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
 
                   {/* paso 2: hora */}
                   <div>
-                    <h4 className="flex items-center gap-2 text-sm font-semibold text-navy-900">
-                      <Clock size={16} className="text-accent-600" />
+                    <h4 className="flex items-center gap-2 text-sm font-semibold text-stone-900">
+                      <Clock size={16} className="text-brand-600" />
                       2. Elige un horario
                     </h4>
                     {selectedDate ? (
@@ -307,8 +307,8 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                             className={cn(
                               'rounded-xl border px-3 py-2 text-sm font-medium transition-colors',
                               selectedTime === time
-                                ? 'border-accent-600 bg-accent-600 text-white'
-                                : 'border-graphite-200 text-graphite-700 hover:border-accent-300 hover:bg-accent-50',
+                                ? 'border-brand-600 bg-brand-600 text-white'
+                                : 'border-sand-200 text-stone-700 hover:border-brand-300 hover:bg-brand-50',
                             )}
                           >
                             {time}
@@ -316,7 +316,7 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                         ))}
                       </div>
                     ) : (
-                      <p className="mt-3 text-sm text-graphite-400">
+                      <p className="mt-3 text-sm text-stone-400">
                         Selecciona primero una fecha disponible.
                       </p>
                     )}
@@ -324,7 +324,7 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
 
                   {/* paso 3: datos */}
                   <div>
-                    <h4 className="text-sm font-semibold text-navy-900">3. Tus datos</h4>
+                    <h4 className="text-sm font-semibold text-stone-900">3. Tus datos</h4>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <Input
                         placeholder="Nombre completo"

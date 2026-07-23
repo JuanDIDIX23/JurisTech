@@ -22,7 +22,7 @@ export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
       {/* overlay móvil */}
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-navy-950/40 backdrop-blur-sm transition-opacity lg:hidden',
+          'fixed inset-0 z-40 bg-stone-950/40 backdrop-blur-sm transition-opacity lg:hidden',
           mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}
         onClick={onNavigate}
@@ -30,11 +30,11 @@ export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-graphite-200/70 bg-white transition-transform duration-300 lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-sand-200 bg-white transition-transform duration-300 lg:translate-x-0',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <div className="flex h-16 items-center border-b border-graphite-200/70 px-6">
+        <div className="flex h-16 items-center border-b border-sand-200 px-6">
           <Link to={ROUTES.home}>
             <Logo />
           </Link>
@@ -51,8 +51,8 @@ export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
                 cn(
                   'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-navy-900 text-white'
-                    : 'text-graphite-600 hover:bg-graphite-100 hover:text-navy-900',
+                    ? 'bg-brand-600 text-white'
+                    : 'text-stone-600 hover:bg-sand-100 hover:text-stone-900',
                 )
               }
             >
@@ -62,7 +62,7 @@ export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
                     size={18}
                     className={cn(
                       'transition-colors',
-                      isActive ? 'text-accent-300' : 'text-graphite-400 group-hover:text-navy-700',
+                      isActive ? 'text-white' : 'text-stone-400 group-hover:text-stone-700',
                     )}
                   />
                   {label}
@@ -77,35 +77,35 @@ export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
           <Link
             to={ROUTES.tokens}
             onClick={onNavigate}
-            className="block rounded-xl border border-graphite-200/70 bg-graphite-50 p-4 transition-colors hover:border-accent-200"
+            className="block rounded-xl border border-sand-200 bg-sand-50 p-4 transition-colors hover:border-brand-200"
           >
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-graphite-600">
-                <Coins size={14} className="text-accent-500" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-600">
+                <Coins size={14} className="text-brand-500" />
                 Tokens
               </span>
-              <span className="text-xs font-semibold text-navy-900">
+              <span className="text-xs font-semibold text-stone-900">
                 {formatNumber(tokenSummary.remaining)}
               </span>
             </div>
-            <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-graphite-200">
+            <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-sand-200">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-accent-500 to-accent-400"
+                className="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-400"
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <p className="mt-2 text-[11px] text-graphite-500">
+            <p className="mt-2 text-[11px] text-stone-500">
               {pct}% disponible · plan {company.plan.name}
             </p>
           </Link>
         </div>
 
-        <div className="border-t border-graphite-200/70 p-3">
+        <div className="border-t border-sand-200 p-3">
           <Link
             to={ROUTES.home}
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-graphite-500 transition-colors hover:bg-graphite-100 hover:text-rose-600"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-500 transition-colors hover:bg-sand-100 hover:text-rose-600"
           >
-            <LogOut size={18} className="text-graphite-400" />
+            <LogOut size={18} className="text-stone-400" />
             Cerrar sesión
           </Link>
         </div>

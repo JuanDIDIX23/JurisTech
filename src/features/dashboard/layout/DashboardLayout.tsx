@@ -7,7 +7,7 @@ export function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-graphite-50">
+    <div className="min-h-screen bg-sand-50">
       <Sidebar mobileOpen={mobileOpen} onNavigate={() => setMobileOpen(false)} />
 
       <div className="lg:pl-64">

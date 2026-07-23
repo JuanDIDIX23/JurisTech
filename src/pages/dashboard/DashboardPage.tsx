@@ -69,33 +69,33 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Consumo de tokens</CardTitle>
-              <span className="text-xs text-graphite-500">
+              <span className="text-xs text-stone-500">
                 Renovación · plan {company.plan.name}
               </span>
             </CardHeader>
             <CardBody>
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-3xl font-bold text-navy-900">
+                  <p className="text-3xl font-bold text-stone-900">
                     {formatNumber(tokenSummary.consumed)}
-                    <span className="text-base font-medium text-graphite-400">
+                    <span className="text-base font-medium text-stone-400">
                       {' '}
                       / {formatNumber(tokenSummary.purchased)}
                     </span>
                   </p>
-                  <p className="mt-1 text-sm text-graphite-500">tokens utilizados este ciclo</p>
+                  <p className="mt-1 text-sm text-stone-500">tokens utilizados este ciclo</p>
                 </div>
-                <span className="rounded-full bg-accent-50 px-3 py-1 text-sm font-semibold text-accent-700">
+                <span className="rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-700">
                   {usagePct}%
                 </span>
               </div>
-              <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-graphite-100">
+              <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-sand-200">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-accent-600 to-accent-400 transition-all"
+                  className="h-full rounded-full bg-gradient-to-r from-brand-600 to-brand-400 transition-all"
                   style={{ width: `${usagePct}%` }}
                 />
               </div>
-              <div className="mt-3 flex justify-between text-xs text-graphite-400">
+              <div className="mt-3 flex justify-between text-xs text-stone-400">
                 <span>0</span>
                 <span>{formatNumber(tokenSummary.remaining)} restantes</span>
               </div>
@@ -107,7 +107,7 @@ export default function DashboardPage() {
               <CardTitle>Solicitudes activas</CardTitle>
               <Link
                 to={ROUTES.requests}
-                className="text-xs font-medium text-accent-600 hover:text-accent-700"
+                className="text-xs font-medium text-brand-600 hover:text-brand-700"
               >
                 Ver todas
               </Link>
@@ -117,11 +117,11 @@ export default function DashboardPage() {
                 <Link
                   key={req.id}
                   to={ROUTES.requestDetail(req.id)}
-                  className="flex items-center justify-between rounded-xl border border-graphite-200/70 px-4 py-3 transition-colors hover:border-accent-200 hover:bg-graphite-50"
+                  className="flex items-center justify-between rounded-xl border border-sand-200 px-4 py-3 transition-colors hover:border-brand-200 hover:bg-sand-50"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-navy-900">{req.title}</p>
-                    <p className="text-xs text-graphite-500">
+                    <p className="truncate text-sm font-medium text-stone-900">{req.title}</p>
+                    <p className="text-xs text-stone-500">
                       {req.reference} · {req.assignedTo}
                     </p>
                   </div>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                 </Link>
               ))}
               {activeRequests.length === 0 && (
-                <p className="py-6 text-center text-sm text-graphite-400">
+                <p className="py-6 text-center text-sm text-stone-400">
                   No tienes solicitudes activas.
                 </p>
               )}
@@ -143,7 +143,7 @@ export default function DashboardPage() {
             <CardTitle>Documentos recientes</CardTitle>
             <Link
               to={ROUTES.documents}
-              className="text-xs font-medium text-accent-600 hover:text-accent-700"
+              className="text-xs font-medium text-brand-600 hover:text-brand-700"
             >
               Ver todos
             </Link>
@@ -152,17 +152,17 @@ export default function DashboardPage() {
             {recentDocs.map((doc) => (
               <div
                 key={doc.id}
-                className="group flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-graphite-50"
+                className="group flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-sand-50"
               >
                 <DocumentTypeIcon type={doc.type} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-navy-900">{doc.name}</p>
-                  <p className="text-xs text-graphite-500">
+                  <p className="truncate text-sm font-medium text-stone-900">{doc.name}</p>
+                  <p className="text-xs text-stone-500">
                     {formatFileSize(doc.sizeKb)} · {formatRelative(doc.uploadedAt)}
                   </p>
                 </div>
                 <button
-                  className="text-graphite-300 opacity-0 transition-opacity hover:text-accent-600 group-hover:opacity-100"
+                  className="text-stone-300 opacity-0 transition-opacity hover:text-brand-600 group-hover:opacity-100"
                   aria-label={`Descargar ${doc.name}`}
                 >
                   <Download size={16} />

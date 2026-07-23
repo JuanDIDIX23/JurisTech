@@ -6,7 +6,7 @@ const COLUMNS = [
   {
     title: 'Producto',
     links: [
-      { label: 'Diferenciación', href: '#beneficios' },
+      { label: 'Diferenciación', href: '#comparativa' },
       { label: 'Tokens', href: '#tokens' },
       { label: 'Servicios', href: '#servicios' },
       { label: 'Preguntas frecuentes', href: '#faq' },
@@ -15,8 +15,8 @@ const COLUMNS = [
   {
     title: 'Empresa',
     links: [
-      { label: 'Sobre nosotros', href: '#beneficios' },
-      { label: 'Afiliados', href: '#faq' },
+      { label: 'Sobre nosotros', href: '#nosotros' },
+      { label: 'Valores', href: '#valores' },
       { label: 'Blog', href: '#' },
       { label: 'Contacto', href: '#contacto' },
     ],
@@ -34,12 +34,12 @@ const COLUMNS = [
 
 export function LandingFooter() {
   return (
-    <footer className="border-t border-graphite-200/70 bg-graphite-50">
+    <footer className="border-t border-sand-200 bg-sand-50">
       <div className="container-page py-16">
         <div className="grid gap-10 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Logo />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-graphite-500">
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-stone-500">
               Derecho, innovación y confianza para tu empresa. Plataforma de afiliación jurídica
               para pymes con tokens flexibles y atención remota.
             </p>
@@ -47,13 +47,13 @@ export function LandingFooter() {
 
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <h4 className="text-sm font-semibold text-navy-900">{col.title}</h4>
+              <h4 className="text-sm font-semibold text-stone-900">{col.title}</h4>
               <ul className="mt-4 space-y-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-sm text-graphite-500 transition-colors hover:text-accent-600"
+                      className="text-sm text-stone-500 transition-colors hover:text-brand-600"
                     >
                       {link.label}
                     </a>
@@ -64,13 +64,13 @@ export function LandingFooter() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-graphite-200/70 pt-8 sm:flex-row">
-          <p className="text-sm text-graphite-400">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-sand-200 pt-8 sm:flex-row">
+          <p className="text-sm text-stone-400">
             © {new Date().getFullYear()} JurisTech. Todos los derechos reservados.
           </p>
           <Link
             to={ROUTES.dashboard}
-            className="text-sm font-medium text-accent-600 hover:text-accent-700"
+            className="text-sm font-medium text-brand-600 hover:text-brand-700"
           >
             Acceder a la plataforma →
           </Link>

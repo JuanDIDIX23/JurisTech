@@ -12,28 +12,28 @@
   }
 
   body {
-    @apply bg-white font-sans text-graphite-900 antialiased;
+    @apply bg-sand-50 font-sans text-stone-900 antialiased;
     text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    @apply bg-accent-500/20 text-navy-900;
+    @apply bg-brand-500/20 text-stone-900;
   }
 
   /* Scrollbar sutil */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(103, 116, 141, 0.35) transparent;
+    scrollbar-color: rgba(116, 116, 116, 0.35) transparent;
   }
   *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   *::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-graphite-300/60;
+    @apply rounded-full bg-stone-300/60;
   }
   *::-webkit-scrollbar-thumb:hover {
-    @apply bg-graphite-400/70;
+    @apply bg-stone-400/70;
   }
 }
 
@@ -43,10 +43,10 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-br from-white via-white to-accent-300 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-white via-white to-brand-300 bg-clip-text text-transparent;
   }
 
   .surface-card {
-    @apply rounded-2xl border border-graphite-200/70 bg-white shadow-card;
+    @apply rounded-2xl border border-sand-200 bg-white shadow-card;
   }
 }

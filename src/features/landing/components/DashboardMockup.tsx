@@ -10,16 +10,16 @@ export function DashboardMockup() {
   return (
     <div className="relative">
       {/* halo */}
-      <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-accent-500/20 blur-3xl" />
+      <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-brand-500/20 blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 24, rotateX: 8 }}
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="overflow-hidden rounded-2xl border border-white/10 bg-navy-900 shadow-[0_40px_120px_-30px_rgba(7,13,28,0.8)]"
+        className="overflow-hidden rounded-2xl border border-white/10 bg-brand-900 shadow-[0_40px_120px_-30px_rgba(7,13,28,0.8)]"
       >
         {/* topbar de la ventana */}
-        <div className="flex items-center gap-2 border-b border-white/5 bg-navy-950/60 px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-white/5 bg-brand-950/60 px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-rose-400/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
@@ -33,7 +33,7 @@ export function DashboardMockup() {
               <div
                 key={i}
                 className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${
-                  i === 0 ? 'bg-accent-500/15 text-accent-200' : 'text-graphite-400'
+                  i === 0 ? 'bg-brand-500/15 text-brand-200' : 'text-stone-400'
                 }`}
               >
                 <Icon size={15} />
@@ -46,12 +46,12 @@ export function DashboardMockup() {
           <main className="col-span-12 space-y-4 p-4 sm:col-span-9">
             <div className="grid grid-cols-3 gap-3">
               {[
-                { label: 'Tokens disp.', value: '182', tone: 'text-accent-300' },
+                { label: 'Tokens disp.', value: '182', tone: 'text-brand-300' },
                 { label: 'Consumidos', value: '318', tone: 'text-white' },
                 { label: 'Activas', value: '3', tone: 'text-white' },
               ].map((c) => (
                 <div key={c.label} className="rounded-xl border border-white/5 bg-white/5 p-3">
-                  <p className="text-[10px] uppercase tracking-wide text-graphite-400">{c.label}</p>
+                  <p className="text-[10px] uppercase tracking-wide text-stone-400">{c.label}</p>
                   <p className={`mt-1 text-lg font-semibold ${c.tone}`}>{c.value}</p>
                 </div>
               ))}
@@ -74,7 +74,7 @@ export function DashboardMockup() {
                     transition={{ delay: 0.5 + i * 0.06, duration: 0.5, ease: 'easeOut' }}
                     className={`flex-1 rounded-md ${
                       i === bars.length - 1
-                        ? 'bg-gradient-to-t from-accent-500 to-accent-300'
+                        ? 'bg-gradient-to-t from-brand-500 to-brand-300'
                         : 'bg-white/15'
                     }`}
                   />
@@ -90,10 +90,10 @@ export function DashboardMockup() {
                   className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2.5"
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-accent-500/15 text-accent-200">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-brand-500/15 text-brand-200">
                       <FileText size={13} />
                     </span>
-                    <span className="text-xs text-graphite-200">{d}</span>
+                    <span className="text-xs text-stone-200">{d}</span>
                   </div>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] ${
@@ -114,14 +114,14 @@ export function DashboardMockup() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.6 }}
-        className="absolute -bottom-5 -left-4 hidden items-center gap-3 rounded-xl border border-graphite-200 bg-white px-4 py-3 shadow-card lg:flex"
+        className="absolute -bottom-5 -left-4 hidden items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-card lg:flex"
       >
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-50 text-accent-600">
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
           <Coins size={17} />
         </span>
         <div>
-          <p className="text-xs font-semibold text-navy-900">182 tokens disponibles</p>
-          <p className="text-[11px] text-graphite-500">Renovación el 15 jul</p>
+          <p className="text-xs font-semibold text-brand-900">182 tokens disponibles</p>
+          <p className="text-[11px] text-stone-500">Renovación el 15 jul</p>
         </div>
       </motion.div>
     </div>

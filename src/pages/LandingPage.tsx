@@ -1,11 +1,13 @@
 import {
   LandingNavbar,
   HeroSection,
-  BenefitsSection,
+  NosotrosSection,
+  ValoresSection,
+  ComparativaSection,
   TokensSection,
   ServicesSection,
   FaqSection,
-  FinalCtaSection,
+  ContactoSection,
   LandingFooter,
 } from '@features/landing';
 
@@ -15,11 +17,13 @@ export default function LandingPage() {
       <LandingNavbar />
       <main>
         <HeroSection />
-        <BenefitsSection />
+        <NosotrosSection />
+        <ValoresSection />
+        <ComparativaSection />
         <TokensSection />
         <ServicesSection />
         <FaqSection />
-        <FinalCtaSection />
+        <ContactoSection />
       </main>
       <LandingFooter />
     </div>

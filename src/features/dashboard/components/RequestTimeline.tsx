@@ -13,7 +13,7 @@ export function RequestTimeline({ events }: { events: RequestTimelineEvent[] }) 
           <li key={ev.id} className="relative flex gap-4">
             {/* línea conectora */}
             {!isLast && (
-              <span className="absolute left-[15px] top-8 h-[calc(100%+0.6rem)] w-px bg-graphite-200" />
+              <span className="absolute left-[15px] top-8 h-[calc(100%+0.6rem)] w-px bg-sand-200" />
             )}
             <span
               className={cn(
@@ -24,9 +24,9 @@ export function RequestTimeline({ events }: { events: RequestTimelineEvent[] }) 
               <Check size={14} />
             </span>
             <div className="pt-0.5">
-              <p className="text-sm font-semibold text-navy-900">{ev.title}</p>
-              <p className="mt-0.5 text-sm text-graphite-500">{ev.description}</p>
-              <p className="mt-1 text-xs text-graphite-400">{formatDateTime(ev.date)}</p>
+              <p className="text-sm font-semibold text-stone-900">{ev.title}</p>
+              <p className="mt-0.5 text-sm text-stone-500">{ev.description}</p>
+              <p className="mt-1 text-xs text-stone-400">{formatDateTime(ev.date)}</p>
             </div>
           </li>
         );

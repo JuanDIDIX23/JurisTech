@@ -16,12 +16,12 @@ export function StatCard({ label, value, icon: Icon, delta, hint, accent }: Stat
   const positive = (delta ?? 0) >= 0;
 
   return (
-    <Card className={cn('p-5', accent && 'border-accent-200 bg-accent-50/40')}>
+    <Card className={cn('p-5', accent && 'border-brand-200 bg-brand-50/40')}>
       <div className="flex items-start justify-between">
         <span
           className={cn(
             'inline-flex h-10 w-10 items-center justify-center rounded-xl',
-            accent ? 'bg-accent-600 text-white' : 'bg-navy-900 text-accent-300',
+            accent ? 'bg-brand-600 text-white' : 'bg-stone-900 text-brand-300',
           )}
         >
           <Icon size={18} />
@@ -39,9 +39,9 @@ export function StatCard({ label, value, icon: Icon, delta, hint, accent }: Stat
         )}
       </div>
 
-      <p className="mt-4 text-3xl font-bold tracking-tight text-navy-900">{value}</p>
-      <p className="mt-1 text-sm font-medium text-graphite-600">{label}</p>
-      {hint && <p className="mt-0.5 text-xs text-graphite-400">{hint}</p>}
+      <p className="mt-4 text-3xl font-bold tracking-tight text-stone-900">{value}</p>
+      <p className="mt-1 text-sm font-medium text-stone-600">{label}</p>
+      {hint && <p className="mt-0.5 text-xs text-stone-400">{hint}</p>}
     </Card>
   );
 }

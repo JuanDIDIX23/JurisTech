@@ -66,16 +66,16 @@ export default function RequestsPage() {
                   className={cn(
                     'w-full rounded-2xl border bg-white p-4 text-left transition-all',
                     active
-                      ? 'border-accent-300 shadow-card ring-1 ring-accent-200'
-                      : 'border-graphite-200/70 hover:border-graphite-300 hover:shadow-card',
+                      ? 'border-brand-300 shadow-card ring-1 ring-brand-200'
+                      : 'border-sand-200 hover:border-sand-300 hover:shadow-card',
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-medium text-graphite-400">{req.reference}</span>
+                    <span className="text-xs font-medium text-stone-400">{req.reference}</span>
                     <StatusBadge status={req.status} />
                   </div>
-                  <p className="mt-2 text-sm font-semibold text-navy-900">{req.title}</p>
-                  <div className="mt-3 flex items-center gap-3 text-xs text-graphite-500">
+                  <p className="mt-2 text-sm font-semibold text-stone-900">{req.title}</p>
+                  <div className="mt-3 flex items-center gap-3 text-xs text-stone-500">
                     <span className="inline-flex items-center gap-1">
                       <Tag size={13} />
                       {SERVICE_CATEGORY_LABELS[req.category]}
@@ -91,11 +91,11 @@ export default function RequestsPage() {
 
             {filtered.length === 0 && (
               <Card className="flex flex-col items-center py-14 text-center">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-graphite-100 text-graphite-400">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-sand-100 text-stone-400">
                   <ClipboardList size={20} />
                 </span>
-                <p className="mt-3 text-sm font-medium text-navy-900">Sin solicitudes</p>
-                <p className="mt-1 text-sm text-graphite-500">No hay solicitudes con este estado.</p>
+                <p className="mt-3 text-sm font-medium text-stone-900">Sin solicitudes</p>
+                <p className="mt-1 text-sm text-stone-500">No hay solicitudes con este estado.</p>
               </Card>
             )}
           </div>
@@ -107,7 +107,7 @@ export default function RequestsPage() {
             <Card>
               <CardHeader className="flex-col items-start gap-3 sm:flex-row sm:items-center">
                 <div>
-                  <span className="text-xs font-medium text-graphite-400">
+                  <span className="text-xs font-medium text-stone-400">
                     {selected.reference}
                   </span>
                   <CardTitle className="mt-1 text-base">{selected.title}</CardTitle>
@@ -115,7 +115,7 @@ export default function RequestsPage() {
                 <StatusBadge status={selected.status} />
               </CardHeader>
               <CardBody>
-                <div className="grid grid-cols-2 gap-4 rounded-xl bg-graphite-50 p-4 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-4 rounded-xl bg-sand-50 p-4 sm:grid-cols-4">
                   <Meta icon={Tag} label="Área" value={SERVICE_CATEGORY_LABELS[selected.category]} />
                   <Meta icon={User} label="Asignado a" value={selected.assignedTo} />
                   <Meta icon={Coins} label="Coste" value={`${selected.tokensCost} tokens`} />
@@ -123,13 +123,13 @@ export default function RequestsPage() {
                 </div>
 
                 <div className="mt-7">
-                  <h4 className="mb-5 text-sm font-semibold text-navy-900">Seguimiento</h4>
+                  <h4 className="mb-5 text-sm font-semibold text-stone-900">Seguimiento</h4>
                   <RequestTimeline events={selected.timeline} />
                 </div>
               </CardBody>
             </Card>
           ) : (
-            <Card className="flex items-center justify-center py-20 text-sm text-graphite-400">
+            <Card className="flex items-center justify-center py-20 text-sm text-stone-400">
               Selecciona una solicitud para ver el detalle.
             </Card>
           )}
@@ -150,11 +150,11 @@ function Meta({
 }) {
   return (
     <div>
-      <span className="inline-flex items-center gap-1.5 text-xs text-graphite-500">
+      <span className="inline-flex items-center gap-1.5 text-xs text-stone-500">
         <Icon size={13} />
         {label}
       </span>
-      <p className="mt-1 text-sm font-medium text-navy-900">{value}</p>
+      <p className="mt-1 text-sm font-medium text-stone-900">{value}</p>
     </div>
   );
 }

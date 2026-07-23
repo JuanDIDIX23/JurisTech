@@ -6,7 +6,7 @@ import { cn } from '@shared/lib/cn';
 import { ROUTES } from '@app/routes';
 
 const NAV_LINKS = [
-  { label: 'Beneficios', href: '#beneficios' },
+  { label: 'Nosotros', href: '#nosotros' },
   { label: 'Tokens', href: '#tokens' },
   { label: 'Servicios', href: '#servicios' },
   { label: 'FAQ', href: '#faq' },
@@ -28,7 +28,7 @@ export function LandingNavbar() {
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-all duration-300',
         scrolled
-          ? 'border-b border-graphite-200/70 bg-white/80 backdrop-blur-xl'
+          ? 'border-b border-sand-200 bg-white/80 backdrop-blur-xl'
           : 'border-b border-transparent',
       )}
     >
@@ -42,7 +42,7 @@ export function LandingNavbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-graphite-600 transition-colors hover:text-navy-900"
+              className="text-sm font-medium text-stone-600 transition-colors hover:text-stone-900"
             >
               {link.label}
             </a>
@@ -63,7 +63,7 @@ export function LandingNavbar() {
         </div>
 
         <button
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-700 md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-stone-700 md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-label="Menú"
         >
@@ -72,14 +72,14 @@ export function LandingNavbar() {
       </nav>
 
       {open && (
-        <div className="border-t border-graphite-200/70 bg-white md:hidden">
+        <div className="border-t border-sand-200 bg-white md:hidden">
           <div className="container-page flex flex-col gap-1 py-4">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-graphite-700 hover:bg-graphite-100"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-sand-100"
               >
                 {link.label}
               </a>

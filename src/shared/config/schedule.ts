@@ -20,3 +20,19 @@ export const SCHEDULE_CONFIG: ScheduleConfig = {
   maxDays: 30,
   timezone: 'America/Bogota',
 };
+
+// Canales de contacto directo. Editable sin tocar los componentes.
+// NOTA: números y correo de prueba — reemplazar por los reales.
+export interface ContactConfig {
+  /** Número en formato internacional sin símbolos (para el enlace wa.me). */
+  whatsappNumber: string;
+  /** Número legible para mostrar en la interfaz. */
+  whatsappDisplay: string;
+  email: string;
+}
+
+export const CONTACT_CONFIG: ContactConfig = {
+  whatsappNumber: '573000000000',
+  whatsappDisplay: '+57 300 000 0000',
+  email: 'contacto@juristech.co',
+};

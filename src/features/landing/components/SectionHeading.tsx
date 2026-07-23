@@ -25,13 +25,13 @@ export function SectionHeading({
       viewport={{ once: true, margin: '-80px' }}
       className={cn('max-w-2xl', align === 'center' ? 'mx-auto text-center' : 'text-left')}
     >
-      <span className="text-sm font-semibold uppercase tracking-wider text-accent-600">
+      <span className="text-xs font-semibold uppercase tracking-widest text-brand-600">
         {eyebrow}
       </span>
       <h2
         className={cn(
-          'mt-3 text-3xl font-bold tracking-tight sm:text-4xl',
-          tone === 'dark' ? 'text-navy-900' : 'text-white',
+          'mt-3 text-3xl font-bold leading-snug tracking-tight',
+          tone === 'dark' ? 'text-stone-900' : 'text-white',
         )}
       >
         {title}
@@ -39,8 +39,8 @@ export function SectionHeading({
       {description && (
         <p
           className={cn(
-            'mt-4 text-lg leading-relaxed',
-            tone === 'dark' ? 'text-graphite-500' : 'text-graphite-300',
+            'mt-4 text-base font-normal leading-relaxed',
+            tone === 'dark' ? 'text-stone-500' : 'text-stone-300',
           )}
         >
           {description}

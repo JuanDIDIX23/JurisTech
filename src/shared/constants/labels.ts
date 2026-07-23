@@ -15,9 +15,9 @@ export const REQUEST_STATUS_LABELS: Record<RequestStatus, string> = {
 
 // Tono de cada estado para badges (clases tailwind).
 export const REQUEST_STATUS_TONE: Record<RequestStatus, string> = {
-  pending: 'bg-graphite-100 text-graphite-600 ring-graphite-200',
+  pending: 'bg-sand-100 text-stone-600 ring-sand-200',
   in_review: 'bg-amber-50 text-amber-700 ring-amber-200',
-  in_progress: 'bg-accent-50 text-accent-700 ring-accent-200',
+  in_progress: 'bg-brand-50 text-brand-700 ring-brand-200',
   completed: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   cancelled: 'bg-rose-50 text-rose-700 ring-rose-200',
 };

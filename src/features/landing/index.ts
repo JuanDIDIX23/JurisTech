@@ -1,8 +1,10 @@
 export { LandingNavbar } from './components/LandingNavbar';
 export { HeroSection } from './components/HeroSection';
-export { BenefitsSection } from './components/BenefitsSection';
+export { NosotrosSection } from './components/NosotrosSection';
+export { ValoresSection } from './components/ValoresSection';
+export { ComparativaSection } from './components/ComparativaSection';
 export { TokensSection } from './components/TokensSection';
 export { ServicesSection } from './components/ServicesSection';
 export { FaqSection } from './components/FaqSection';
-export { FinalCtaSection } from './components/FinalCtaSection';
+export { ContactoSection } from './components/ContactoSection';
 export { LandingFooter } from './components/LandingFooter';
