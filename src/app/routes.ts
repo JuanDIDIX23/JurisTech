@@ -16,6 +16,9 @@ export const ROUTES = {
   admin: '/admin',
   adminLeads: '/admin/leads',
   adminCitas: '/admin/citas',
+  adminAfiliados: '/admin/afiliados',
+  adminAfiliadoDetalle: (id = ':id') => `/admin/afiliados/${id}`,
+  adminSolicitudes: '/admin/solicitudes',
   adminStats: '/admin/estadisticas',
   adminConfig: '/admin/config',
 } as const;

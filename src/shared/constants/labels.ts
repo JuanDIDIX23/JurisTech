@@ -1,11 +1,18 @@
 import type {
-  CitaEstado,
   DocumentType,
-  LeadEstado,
   RequestStatus,
   ServiceCategory,
   TokenMovementType,
 } from '@shared/types';
+import type {
+  AfiliadoEstado,
+  CitaEstado,
+  LeadEstado,
+  SolicitudEstado,
+  SolicitudPrioridad,
+  SolicitudTipo,
+  TokenMovementTipo,
+} from '@shared/types/supabase';
 
 // --- Panel de administración -------------------------------------------
 
@@ -37,6 +44,74 @@ export const CITA_ESTADO_TONE: Record<CitaEstado, string> = {
   confirmada: 'bg-brand-50 text-brand-700 ring-brand-200',
   cancelada: 'bg-rose-50 text-rose-700 ring-rose-200',
   completada: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+};
+
+// --- Fase 2: afiliados -------------------------------------------------
+
+export const SOLICITUD_TIPO_LABELS: Record<SolicitudTipo, string> = {
+  consulta_laboral: 'Consulta laboral',
+  revision_contrato: 'Revisión de contrato',
+  elaboracion_contrato: 'Elaboración de contrato',
+  concepto_seguridad_social: 'Concepto de seguridad social',
+  acompanamiento_preventivo: 'Acompañamiento preventivo',
+  revision_acuerdo_comercial: 'Revisión de acuerdo comercial',
+  otro: 'Otro',
+};
+
+export const SOLICITUD_ESTADO_LABELS: Record<SolicitudEstado, string> = {
+  recibida: 'Recibida',
+  en_revision: 'En revisión',
+  en_proceso: 'En proceso',
+  entregada: 'Entregada',
+  cerrada: 'Cerrada',
+  cancelada: 'Cancelada',
+};
+
+export const SOLICITUD_ESTADO_TONE: Record<SolicitudEstado, string> = {
+  recibida: 'bg-sand-100 text-stone-600 ring-sand-200',
+  en_revision: 'bg-amber-50 text-amber-700 ring-amber-200',
+  en_proceso: 'bg-brand-50 text-brand-700 ring-brand-200',
+  entregada: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  cerrada: 'bg-stone-100 text-stone-600 ring-stone-200',
+  cancelada: 'bg-rose-50 text-rose-700 ring-rose-200',
+};
+
+/** Orden cronológico del flujo, para el timeline de la solicitud. */
+export const SOLICITUD_FLUJO: SolicitudEstado[] = [
+  'recibida',
+  'en_revision',
+  'en_proceso',
+  'entregada',
+  'cerrada',
+];
+
+export const SOLICITUD_PRIORIDAD_LABELS: Record<SolicitudPrioridad, string> = {
+  normal: 'Normal',
+  urgente: 'Urgente',
+};
+
+export const SOLICITUD_PRIORIDAD_TONE: Record<SolicitudPrioridad, string> = {
+  normal: 'bg-sand-100 text-stone-600 ring-sand-200',
+  urgente: 'bg-rose-50 text-rose-700 ring-rose-200',
+};
+
+export const AFILIADO_ESTADO_LABELS: Record<AfiliadoEstado, string> = {
+  activo: 'Activo',
+  suspendido: 'Suspendido',
+  cancelado: 'Cancelado',
+};
+
+export const AFILIADO_ESTADO_TONE: Record<AfiliadoEstado, string> = {
+  activo: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  suspendido: 'bg-amber-50 text-amber-700 ring-amber-200',
+  cancelado: 'bg-rose-50 text-rose-700 ring-rose-200',
+};
+
+export const TOKEN_MOVIMIENTO_LABELS: Record<TokenMovementTipo, string> = {
+  recarga: 'Recarga',
+  consumo: 'Consumo',
+  reembolso: 'Reembolso',
+  ajuste: 'Ajuste',
 };
 
 /** Servicios ofrecidos en el formulario de contacto (para filtros). */

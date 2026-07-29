@@ -1,6 +1,7 @@
-// Tipos de dominio compartidos. Pensados para mapear 1:1 con un backend futuro.
-
-export * from './supabase';
+// Tipos de dominio compartidos (mocks de la Fase 1 del dashboard).
+// Los tipos que mapean tablas de Supabase viven en './supabase' y se importan
+// explícitamente desde '@shared/types/supabase': no se reexportan aquí porque
+// `Plan` y `TokenMovement` existen en ambos ficheros con formas distintas.
 
 export type ID = string;
 

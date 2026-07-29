@@ -4,7 +4,7 @@ import { LogOut, Coins } from 'lucide-react';
 import { Logo } from '@shared/ui';
 import { cn } from '@shared/lib/cn';
 import { ROUTES } from '@app/routes';
-import { useAppStore } from '@shared/store/useAppStore';
+import { useAfiliadoStore } from '@shared/store/afiliadoStore';
 import { useAuthStore } from '@shared/store/authStore';
 import { formatNumber } from '@shared/lib/format';
 import { DASHBOARD_NAV } from '../config/navigation';
@@ -16,17 +16,22 @@ interface SidebarProps {
 }
 
 export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
-  const { tokenSummary, company } = useAppStore();
+  const afiliado = useAfiliadoStore((s) => s.afiliado);
   const signOut = useAuthStore((s) => s.signOut);
+  const limpiarAfiliado = useAfiliadoStore((s) => s.limpiar);
   const navigate = useNavigate();
   const [signingOut, setSigningOut] = useState(false);
-  const pct = Math.round((tokenSummary.remaining / tokenSummary.purchased) * 100);
+
+  const disponibles = afiliado?.tokens_disponibles ?? 0;
+  const delPlan = afiliado?.plan?.tokens_incluidos ?? 0;
+  const pct = delPlan > 0 ? Math.min(100, Math.round((disponibles / delPlan) * 100)) : 0;
 
   async function handleSignOut() {
     if (signingOut) return;
     setSigningOut(true);
     try {
       await signOut();
+      limpiarAfiliado();
       navigate(ROUTES.login, { replace: true });
     } finally {
       setSigningOut(false);
@@ -101,7 +106,7 @@ export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
                 Tokens
               </span>
               <span className="text-xs font-semibold text-stone-900">
-                {formatNumber(tokenSummary.remaining)}
+                {formatNumber(disponibles)}
               </span>
             </div>
             <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-sand-200">
@@ -111,7 +116,9 @@ export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
               />
             </div>
             <p className="mt-2 text-[11px] text-stone-500">
-              {pct}% disponible · plan {company.plan.name}
+              {delPlan > 0
+                ? `${pct}% disponible · plan ${afiliado?.plan?.nombre ?? '—'}`
+                : 'Sin plan asignado'}
             </p>
           </Link>
         </div>

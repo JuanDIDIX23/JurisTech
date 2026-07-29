@@ -1,216 +1,6 @@
 -- =============================================
--- JurisTech — schema completo
---
--- Equivale a schema inicial + migraciones 001, 002, 003 y 004 ya aplicadas.
--- Sirve para levantar un proyecto desde cero; las bases ya desplegadas
--- avanzan con los ficheros de supabase/migrations/.
--- =============================================
-
--- =============================================
--- TABLA: perfiles de usuario
--- =============================================
-CREATE TABLE profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  rol TEXT NOT NULL DEFAULT 'afiliado' CHECK (rol IN ('admin', 'afiliado')),
-  nombre TEXT,
-  empresa TEXT,
-  telefono TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- FIX 2 — Escalada de privilegios: nadie puede cambiar su propio rol.
--- Supabase concede UPDATE a nivel de TABLA a anon/authenticated mediante
--- default privileges. Un REVOKE UPDATE (rol) no surte efecto mientras ese
--- permiso de tabla siga vigente, así que primero se revoca el UPDATE completo
--- y luego se conceden solo las columnas que el afiliado sí puede editar.
-REVOKE UPDATE ON profiles FROM anon, authenticated;
-GRANT UPDATE (nombre, empresa, telefono) ON profiles TO authenticated;
-
--- =============================================
--- TABLA: leads (formulario de contacto público)
--- =============================================
-CREATE TABLE leads (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  nombre TEXT NOT NULL,
-  empresa TEXT,
-  telefono TEXT NOT NULL,
-  correo TEXT,
-  servicio TEXT NOT NULL,
-  mensaje TEXT,
-  estado TEXT DEFAULT 'nuevo'
-    CHECK (estado IN ('nuevo','contactado','en_proceso','cerrado','descartado')),
-  notas TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- =============================================
--- TABLA: citas (modal de agendamiento público)
--- =============================================
-CREATE TABLE citas (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  nombre TEXT NOT NULL,
-  empresa TEXT,
-  telefono TEXT NOT NULL,
-  correo TEXT NOT NULL,
-  fecha DATE NOT NULL,
-  hora TIME NOT NULL,
-  motivo TEXT,
-  estado TEXT DEFAULT 'pendiente'
-    CHECK (estado IN ('pendiente','confirmada','cancelada','completada')),
-  notas TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Una sola cita activa por franja (ver migración 003).
-CREATE UNIQUE INDEX IF NOT EXISTS unique_slot
-  ON citas (fecha, hora)
-  WHERE estado <> 'cancelada';
-
--- =============================================
--- TABLA: configuración del sistema (editable desde admin)
--- =============================================
-CREATE TABLE config (
-  key TEXT PRIMARY KEY,
-  value JSONB NOT NULL,
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Valores iniciales de config
-INSERT INTO config (key, value) VALUES
-  ('schedule', '{
-    "availableDays": [1,2,3,4,5],
-    "startHour": 8,
-    "endHour": 17,
-    "slotDuration": 60,
-    "advanceDays": 1,
-    "maxDays": 30,
-    "timezone": "America/Bogota"
-  }'::jsonb),
-  ('contacto', '{
-    "email": "contacto@juristechlawyers.com",
-    "whatsapp": "573219761348"
-  }'::jsonb);
-
--- =============================================
--- TRIGGERS para updated_at automático
--- =============================================
-CREATE OR REPLACE FUNCTION update_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER profiles_updated_at
-  BEFORE UPDATE ON profiles FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at();
-
-CREATE TRIGGER leads_updated_at
-  BEFORE UPDATE ON leads FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at();
-
-CREATE TRIGGER citas_updated_at
-  BEFORE UPDATE ON citas FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at();
-
--- Auto-crear perfil al registrar usuario
--- FIX 5 — SECURITY DEFINER con search_path fijado.
--- El rol se fija siempre a 'afiliado': nunca se lee del metadata, para que
--- nadie pueda registrarse como admin manipulando la petición de signUp.
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO profiles (id, rol, nombre, empresa, telefono)
-  VALUES (
-    NEW.id,
-    'afiliado',
-    NULLIF(NEW.raw_user_meta_data->>'nombre', ''),
-    NULLIF(NEW.raw_user_meta_data->>'empresa', ''),
-    NULLIF(NEW.raw_user_meta_data->>'telefono', '')
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
-
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
-
--- =============================================
--- FIX 1 — Comprobación de admin sin recursión de RLS
--- SECURITY DEFINER: se ejecuta como owner y no reevalúa las policies de
--- profiles, evitando el error 42P17 (infinite recursion detected in policy).
--- =============================================
-CREATE OR REPLACE FUNCTION is_admin()
-RETURNS BOOLEAN AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM profiles
-    WHERE id = auth.uid() AND rol = 'admin'
-  );
-$$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
-
--- =============================================
--- FIX 3 — Horas ocupadas sin exponer datos personales
--- Devuelve únicamente las horas de una fecha. Los datos del solicitante
--- (nombre, teléfono, correo, motivo) nunca salen de la base.
--- =============================================
-CREATE OR REPLACE FUNCTION horas_ocupadas(fecha_consulta DATE)
-RETURNS TABLE(hora TIME) AS $$
-  SELECT c.hora FROM citas c
-  WHERE c.fecha = fecha_consulta
-  AND c.estado != 'cancelada';
-$$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
-
--- =============================================
--- ROW LEVEL SECURITY
--- =============================================
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
-ALTER TABLE citas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE config ENABLE ROW LEVEL SECURITY;
-
--- Leads: insertar sin autenticar (formulario público)
-CREATE POLICY "leads_insert_public" ON leads
-  FOR INSERT WITH CHECK (true);
-
--- Leads: leer y modificar solo admins
-CREATE POLICY "leads_admin_all" ON leads
-  FOR ALL USING (is_admin());
-
--- Citas: insertar sin autenticar (modal público)
-CREATE POLICY "citas_insert_public" ON citas
-  FOR INSERT WITH CHECK (true);
-
--- Citas: leer solo admins (el público usa la RPC horas_ocupadas)
-CREATE POLICY "citas_admin_select" ON citas
-  FOR SELECT USING (is_admin());
-
--- Citas: modificar solo admins
-CREATE POLICY "citas_admin_update" ON citas
-  FOR UPDATE USING (is_admin());
-
--- Config: leer sin autenticar (schedule para el modal)
-CREATE POLICY "config_read_public" ON config
-  FOR SELECT USING (true);
-
--- Config: modificar solo admins
-CREATE POLICY "config_admin_update" ON config
-  FOR UPDATE USING (is_admin());
-
--- Profiles: cada usuario ve y edita solo el suyo
-CREATE POLICY "profiles_own" ON profiles
-  FOR ALL USING (auth.uid() = id);
-
--- Admins ven todos los perfiles
-CREATE POLICY "profiles_admin_all" ON profiles
-  FOR ALL USING (is_admin());
-
--- =============================================
--- =============================================
--- FASE 2 — Afiliados, solicitudes, documentos y tokens
--- (equivale a la migración 004)
--- =============================================
+-- Migración 004 — Fase 2: afiliados, solicitudes, documentos y tokens
+-- Incluye los 3 fixes críticos y los 4 ajustes menores revisados.
 -- =============================================
 
 -- =============================================
@@ -232,7 +22,7 @@ INSERT INTO planes (nombre, tokens_incluidos, descripcion) VALUES
 
 -- =============================================
 -- TABLA: afiliados (extiende profiles)
--- El saldo nunca puede quedar negativo.
+-- MENOR 1: el saldo nunca puede quedar negativo.
 -- =============================================
 CREATE TABLE afiliados (
   id UUID REFERENCES profiles(id) ON DELETE CASCADE PRIMARY KEY,
@@ -283,15 +73,26 @@ CREATE TABLE solicitudes (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Correlativo de códigos JT-AAAA-NNNN.
--- El contador dedicado evita que el COUNT(*) se ejecute bajo el RLS del
--- afiliado (que solo vería sus propias filas y repetiría códigos), y el
--- bloqueo de fila de ON CONFLICT DO UPDATE serializa las concurrentes.
+-- =============================================
+-- FIX 2 — Correlativo de códigos JT-AAAA-NNNN
+--
+-- La versión con SELECT COUNT(*) tenía tres fallos:
+--   a) sin SECURITY DEFINER, el COUNT se ejecutaba bajo el RLS del afiliado
+--      y solo veía SUS solicitudes, así que el segundo afiliado del sistema
+--      generaba un código repetido y violaba la restricción UNIQUE;
+--   b) dos inserciones simultáneas leían el mismo COUNT;
+--   c) borrar una solicitud hacía que el siguiente código se reutilizara.
+--
+-- El contador dedicado resuelve los tres: INSERT ... ON CONFLICT DO UPDATE
+-- toma un bloqueo de fila, de modo que las transacciones concurrentes se
+-- serializan y el número nunca retrocede.
+-- =============================================
 CREATE TABLE solicitudes_correlativo (
   anio INTEGER PRIMARY KEY,
   ultimo INTEGER NOT NULL DEFAULT 0
 );
 
+-- Tabla interna: no se expone por la API. El trigger la escribe como owner.
 ALTER TABLE solicitudes_correlativo ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON solicitudes_correlativo FROM anon, authenticated;
 
@@ -322,6 +123,8 @@ CREATE TRIGGER solicitudes_updated_at
 
 -- =============================================
 -- TABLA: documentos (subidos por el admin)
+-- MENOR 4: tamano_bytes sin eñe, para no arrastrar problemas de
+-- codificación en clientes y herramientas externas.
 -- =============================================
 CREATE TABLE documentos (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -351,8 +154,11 @@ CREATE TABLE token_movements (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Índices de claves foráneas: Postgres no los crea solo y son las
--- consultas que ejecuta el dashboard del afiliado en cada carga.
+-- =============================================
+-- MENOR 3 — Índices de claves foráneas
+-- Postgres no los crea automáticamente y son exactamente las consultas
+-- que ejecuta el dashboard del afiliado en cada carga.
+-- =============================================
 CREATE INDEX idx_solicitudes_afiliado ON solicitudes (afiliado_id);
 CREATE INDEX idx_documentos_afiliado ON documentos (afiliado_id);
 CREATE INDEX idx_token_movements_afiliado ON token_movements (afiliado_id);
@@ -360,9 +166,13 @@ CREATE INDEX idx_documentos_solicitud ON documentos (solicitud_id);
 CREATE INDEX idx_token_movements_solicitud ON token_movements (solicitud_id);
 CREATE INDEX idx_afiliados_plan ON afiliados (plan_id);
 
--- Movimiento de tokens restringido a administradores.
--- La función es SECURITY DEFINER e ignora el RLS: sin el guardia
--- is_admin() cualquier usuario autenticado podría asignarse tokens por RPC.
+-- =============================================
+-- FIX 1 — Movimiento de tokens restringido a administradores
+--
+-- La función es SECURITY DEFINER, así que ignora el RLS. Sin la
+-- comprobación de is_admin(), cualquier usuario autenticado podía llamarla
+-- por RPC y asignarse los tokens que quisiera.
+-- =============================================
 CREATE OR REPLACE FUNCTION registrar_movimiento_tokens(
   p_afiliado_id UUID,
   p_tipo TEXT,
@@ -378,6 +188,8 @@ BEGIN
     RAISE EXCEPTION 'No autorizado';
   END IF;
 
+  -- 'ajuste' admite cantidades negativas (correcciones manuales);
+  -- el resto siempre suma o resta una cantidad positiva.
   IF p_tipo <> 'ajuste' AND p_cantidad <= 0 THEN
     RAISE EXCEPTION 'La cantidad debe ser mayor que cero';
   END IF;
@@ -397,11 +209,13 @@ BEGIN
     END IF;
   END IF;
 
+  -- Insertar movimiento
   INSERT INTO token_movements
     (afiliado_id, solicitud_id, tipo, cantidad, descripcion, realizado_por)
   VALUES
     (p_afiliado_id, p_solicitud_id, p_tipo, p_cantidad, p_descripcion, p_realizado_por);
 
+  -- Actualizar balance según tipo
   IF p_tipo = 'recarga' OR p_tipo = 'reembolso' OR p_tipo = 'ajuste' THEN
     UPDATE afiliados
     SET tokens_disponibles = tokens_disponibles + p_cantidad
@@ -415,17 +229,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
+-- Se retira el permiso implícito de PUBLIC y se concede solo a
+-- authenticated: los administradores llaman la RPC desde el panel con esa
+-- identidad, y el is_admin() de arriba es lo que rechaza a los afiliados.
 REVOKE EXECUTE ON FUNCTION registrar_movimiento_tokens FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION registrar_movimiento_tokens TO authenticated;
 
--- Permisos por columna en solicitudes: el afiliado solo rellena estas
--- cuatro. Estado, tokens y notas_admin son competencia del panel.
+-- =============================================
+-- MENOR 2 — Permisos por columna en solicitudes
+--
+-- La policy solicitudes_own_insert solo valida afiliado_id, así que un
+-- afiliado podía crear una solicitud ya marcada como 'entregada', fijar
+-- tokens_estimados = 0 o escribir en notas_admin. Igual que con
+-- profiles.rol, un REVOKE de columna no basta mientras exista el permiso
+-- de tabla: primero se retira el INSERT completo y luego se conceden solo
+-- las columnas que el afiliado sí debe rellenar.
+-- =============================================
 REVOKE INSERT ON solicitudes FROM anon, authenticated;
 GRANT INSERT (afiliado_id, tipo, descripcion, prioridad)
   ON solicitudes TO authenticated;
 
 -- =============================================
--- RLS de las tablas de Fase 2
+-- RLS para nuevas tablas
 -- =============================================
 ALTER TABLE planes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE afiliados ENABLE ROW LEVEL SECURITY;
@@ -433,16 +258,19 @@ ALTER TABLE solicitudes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documentos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE token_movements ENABLE ROW LEVEL SECURITY;
 
+-- Planes: lectura pública, escritura solo admin
 CREATE POLICY "planes_read_public" ON planes
   FOR SELECT USING (true);
 CREATE POLICY "planes_admin_write" ON planes
   FOR ALL USING (is_admin());
 
+-- Afiliados: cada uno ve solo el suyo, admin ve todos
 CREATE POLICY "afiliados_own" ON afiliados
   FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "afiliados_admin_all" ON afiliados
   FOR ALL USING (is_admin());
 
+-- Solicitudes: afiliado ve y crea las suyas, admin ve todas
 CREATE POLICY "solicitudes_own_select" ON solicitudes
   FOR SELECT USING (
     afiliado_id = auth.uid() OR is_admin()
@@ -452,6 +280,7 @@ CREATE POLICY "solicitudes_own_insert" ON solicitudes
 CREATE POLICY "solicitudes_admin_update" ON solicitudes
   FOR UPDATE USING (is_admin());
 
+-- Documentos: afiliado ve los suyos, admin gestiona todos
 CREATE POLICY "documentos_own_select" ON documentos
   FOR SELECT USING (
     afiliado_id = auth.uid() OR is_admin()
@@ -459,6 +288,7 @@ CREATE POLICY "documentos_own_select" ON documentos
 CREATE POLICY "documentos_admin_all" ON documentos
   FOR ALL USING (is_admin());
 
+-- Token movements: afiliado ve los suyos, admin gestiona todos
 CREATE POLICY "tokens_own_select" ON token_movements
   FOR SELECT USING (
     afiliado_id = auth.uid() OR is_admin()
@@ -467,9 +297,9 @@ CREATE POLICY "tokens_admin_all" ON token_movements
   FOR ALL USING (is_admin());
 
 -- =============================================
--- VISTA: estadísticas para el dashboard admin
+-- Actualizar vista admin_stats para incluir afiliados activos
 -- =============================================
-CREATE VIEW admin_stats AS
+CREATE OR REPLACE VIEW admin_stats AS
 SELECT
   (SELECT COUNT(*) FROM leads) AS total_leads,
   (SELECT COUNT(*) FROM leads WHERE estado = 'nuevo') AS leads_nuevos,
@@ -487,7 +317,11 @@ SELECT
   (SELECT COUNT(*) FROM solicitudes
     WHERE estado NOT IN ('cerrada','cancelada')) AS solicitudes_activas;
 
--- La vista respeta el RLS de las tablas base y no es legible por anon.
+-- FIX 3 — Reaplicar las opciones de seguridad tras recrear la vista.
+-- CREATE OR REPLACE VIEW puede descartar las reloptions y los permisos
+-- ajustados en el schema inicial; sin estas tres líneas, admin_stats
+-- volvería a ejecutarse con los permisos del propietario (saltándose el
+-- RLS) y anon recuperaría el acceso a las métricas del negocio.
 ALTER VIEW admin_stats SET (security_invoker = on);
 REVOKE ALL ON admin_stats FROM anon;
 GRANT SELECT ON admin_stats TO authenticated;
