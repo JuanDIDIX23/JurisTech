@@ -4,6 +4,7 @@ import { ArrowRight, Menu, X } from 'lucide-react';
 import { Logo, Button } from '@shared/ui';
 import { cn } from '@shared/lib/cn';
 import { ROUTES } from '@app/routes';
+import { useAuthStore } from '@shared/store/authStore';
 
 const NAV_LINKS = [
   { label: 'Nosotros', href: '#nosotros' },
@@ -15,6 +16,18 @@ const NAV_LINKS = [
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+
+  // Destino del CTA según la sesión activa. El valor se recalcula solo
+  // cuando el perfil termina de cargarse, así que un visitante con sesión
+  // recién restaurada acaba en el panel que le corresponde.
+  const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
+
+  const destinoCta = !user
+    ? ROUTES.login
+    : profile?.rol === 'admin'
+      ? ROUTES.admin
+      : ROUTES.dashboard;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -66,7 +79,7 @@ export function LandingNavbar() {
               Iniciar sesión
             </Button>
           </Link>
-          <Link to={ROUTES.dashboard}>
+          <Link to={destinoCta}>
             <Button size="sm" rightIcon={<ArrowRight size={16} />}>
               Empezar
             </Button>
@@ -99,7 +112,7 @@ export function LandingNavbar() {
                 {link.label}
               </a>
             ))}
-            <Link to={ROUTES.dashboard} className="mt-2" onClick={() => setOpen(false)}>
+            <Link to={destinoCta} className="mt-2" onClick={() => setOpen(false)}>
               <Button className="w-full" rightIcon={<ArrowRight size={16} />}>
                 Empezar ahora
               </Button>

@@ -9,7 +9,7 @@ interface BadgeProps {
 
 /**
  * Badge neutro. Para semánticas de color (estados) pásale las clases
- * `ring`/`bg`/`text` desde el llamador (ver REQUEST_STATUS_TONE).
+ * `ring`/`bg`/`text` desde el llamador (ver SOLICITUD_ESTADO_TONE).
  */
 export function Badge({ children, className, dot }: BadgeProps) {
   return (
