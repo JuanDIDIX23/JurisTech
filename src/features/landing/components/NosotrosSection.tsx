@@ -36,28 +36,23 @@ export function NosotrosSection() {
             whileInView="show"
             viewport={{ once: true, margin: '-80px' }}
           >
-            <motion.span
-              variants={fadeUp}
-              className="text-xs font-semibold uppercase tracking-widest text-brand-600"
-            >
-              Nuestra historia
-            </motion.span>
             <motion.h2
               variants={fadeUp}
-              className="mt-3 text-3xl font-bold leading-snug tracking-tight text-stone-900"
+              className="text-4xl font-bold leading-tight tracking-tight text-stone-900 sm:text-5xl"
             >
-              Innovación jurídica nacida de la necesidad real
+              Nuestra historia
             </motion.h2>
             <motion.p
               variants={fadeUp}
-              className="mt-4 text-base font-normal leading-relaxed text-stone-500"
+              className="mt-8 text-justify text-base font-normal leading-relaxed text-stone-500"
             >
-              JurisTech nació de una observación simple: las pymes colombianas necesitan respaldo
-              jurídico constante, pero el modelo tradicional —honorarios fijos y cobros por hora sin
-              previsibilidad— las deja sin control sobre su inversión legal. Somos un equipo que une
-              derecho y tecnología para cambiar esa experiencia: asesoría especializada, preventiva
-              y remota, con un sistema transparente de tokens en el que sabes qué recibes y cuánto
-              cuesta antes de empezar.
+              JurisTech nació como respuesta a una necesidad concreta de las pequeñas y medianas
+              empresas: acceder a asesoría jurídica especializada, preventiva y flexible, sin asumir
+              los costos fijos de una firma tradicional ni la carga económica de mantener abogados
+              internos de forma permanente. <br /><br />En ese contexto, JurisTech ofrece una alternativa
+              diseñada para prevenir riesgos antes de que se conviertan en conflictos, facilitar la
+              toma de decisiones y lograr que cada una de las empresas afiliadas acceda a servicios
+              jurídicos conforme sus necesidades, prioridades y ritmo de operación.
             </motion.p>
 
             {/* misión y visión */}
@@ -72,7 +67,7 @@ export function NosotrosSection() {
                   </span>
                   <h3 className="text-xl font-semibold leading-snug text-stone-900">Misión</h3>
                 </div>
-                <p className="mt-3 text-base font-normal leading-relaxed text-stone-500">
+                <p className="mt-3 text-justify text-base font-normal leading-relaxed text-stone-500">
                   Transformar la experiencia de acceso a los servicios legales de las pequeñas y
                   medianas empresas mediante un modelo innovador de afiliación especializada,
                   preventiva, flexible y de calidad, que integre tecnología, atención remota y un
@@ -90,7 +85,7 @@ export function NosotrosSection() {
                   </span>
                   <h3 className="text-xl font-semibold leading-snug text-stone-900">Visión</h3>
                 </div>
-                <p className="mt-3 text-base font-normal leading-relaxed text-stone-500">
+                <p className="mt-3 text-justify text-base font-normal leading-relaxed text-stone-500">
                   Ser reconocida en Colombia como empresa referente en la innovación de los servicios
                   legales, ofreciendo a las pymes una experiencia jurídica de alta calidad,
                   eficiente, transparente, confiable y personalizada.

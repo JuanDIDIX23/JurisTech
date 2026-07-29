@@ -1,9 +1,11 @@
-import { NavLink, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { LogOut, Coins } from 'lucide-react';
 import { Logo } from '@shared/ui';
 import { cn } from '@shared/lib/cn';
 import { ROUTES } from '@app/routes';
 import { useAppStore } from '@shared/store/useAppStore';
+import { useAuthStore } from '@shared/store/authStore';
 import { formatNumber } from '@shared/lib/format';
 import { DASHBOARD_NAV } from '../config/navigation';
 
@@ -15,7 +17,21 @@ interface SidebarProps {
 
 export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
   const { tokenSummary, company } = useAppStore();
+  const signOut = useAuthStore((s) => s.signOut);
+  const navigate = useNavigate();
+  const [signingOut, setSigningOut] = useState(false);
   const pct = Math.round((tokenSummary.remaining / tokenSummary.purchased) * 100);
+
+  async function handleSignOut() {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOut();
+      navigate(ROUTES.login, { replace: true });
+    } finally {
+      setSigningOut(false);
+    }
+  }
 
   return (
     <>
@@ -101,13 +117,14 @@ export function Sidebar({ mobileOpen, onNavigate }: SidebarProps) {
         </div>
 
         <div className="border-t border-sand-200 p-3">
-          <Link
-            to={ROUTES.home}
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-500 transition-colors hover:bg-sand-100 hover:text-rose-600"
+          <button
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-500 transition-colors hover:bg-sand-100 hover:text-rose-600 disabled:opacity-50"
           >
             <LogOut size={18} className="text-stone-400" />
-            Cerrar sesión
-          </Link>
+            {signingOut ? 'Saliendo…' : 'Cerrar sesión'}
+          </button>
         </div>
       </aside>
     </>

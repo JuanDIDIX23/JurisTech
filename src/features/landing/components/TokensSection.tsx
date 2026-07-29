@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import {
   Wallet,
   Send,
   FileCheck,
-  Check,
   Clock,
   Layers,
   Zap,
@@ -25,24 +25,22 @@ interface Step {
 const STEPS: Step[] = [
   {
     icon: Wallet,
-    step: '01',
-    title: 'Adquiere tokens',
-    description:
-      'Elige un plan mensual o recarga puntual. Cada token es una unidad de trabajo jurídico equivalente.',
+    step: '1',
+    title: 'Adquiere tu bolsa de tokens',
+    description: 'Elige el número de tokens que se adecúe a las necesidades de tu empresa.',
   },
   {
     icon: Send,
-    step: '02',
+    step: '2',
     title: 'Crea una solicitud',
-    description:
-      'Describe tu necesidad legal. Te indicamos el coste estimado en tokens antes de confirmar.',
+    description: 'Comparte tu necesidad y eleva las solicitudes que necesites para tu empresa.',
   },
   {
     icon: FileCheck,
-    step: '03',
-    title: 'Recibe el resultado',
+    step: '3',
+    title: 'Resultado',
     description:
-      'Un especialista resuelve tu caso y el entregable queda disponible en tu gestor documental.',
+      'Nuestro equipo de profesionales atenderá tu solicitud de manera personalizada, remota, trazable, y te indicará el número estimado de tokens para que tengas el control.',
   },
 ];
 
@@ -60,12 +58,22 @@ const FACTORS: Factor[] = [
   { icon: Target, label: 'Valor estratégico' },
 ];
 
-const INCLUDES = [
-  'Sin caducidad mientras tu plan esté activo',
-  'Coste transparente por solicitud',
-  'Bonificaciones por renovación anual',
-  'Reembolso de tokens en solicitudes canceladas',
-];
+const STEP_SPRING = { type: 'spring', stiffness: 260, damping: 18 } as const;
+
+// Entrada escalonada (0.1s entre tarjetas, una sola vez) + hover flotante.
+const stepVariants: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98], delay: i * 0.1 },
+  }),
+  hover: { y: -8, transition: STEP_SPRING },
+};
+
+const stepNumberVariants: Variants = {
+  hover: { scale: 1.2, transition: STEP_SPRING },
+};
 
 export function TokensSection() {
   return (
@@ -76,29 +84,26 @@ export function TokensSection() {
       </div>
 
       <div className="container-page relative">
-        <SectionHeading
-          tone="light"
-          eyebrow="Cómo funcionan los tokens"
-          title="Un modelo flexible, predecible y sin sorpresas"
-          description="Olvídate de las tarifas por hora opacas. Con tokens sabes exactamente qué pagas y para qué."
-        />
+        <SectionHeading tone="light" title="¿Cómo funcionan los tokens?" />
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-60px' }}
-          className="mt-16 grid gap-6 md:grid-cols-3"
-        >
-          {STEPS.map(({ icon: Icon, step, title, description }) => (
+        <div className="mt-16 grid gap-6 md:grid-cols-3">
+          {STEPS.map(({ icon: Icon, step, title, description }, i) => (
             <motion.div
               key={step}
-              variants={fadeUp}
-              className="relative rounded-2xl border border-stone-700 bg-stone-800 p-7"
+              custom={i}
+              variants={stepVariants}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: '-60px' }}
+              whileHover="hover"
+              className="group relative cursor-pointer rounded-2xl border border-stone-700 bg-stone-800 p-7 transition-colors duration-200 hover:border-stone-600 hover:bg-stone-700/60"
             >
-              <span className="absolute right-6 top-6 text-5xl font-bold text-brand-400/30">
+              <motion.span
+                variants={stepNumberVariants}
+                className="absolute right-6 top-6 origin-center text-5xl font-bold text-white transition-colors duration-200 group-hover:text-brand-300"
+              >
                 {step}
-              </span>
+              </motion.span>
               <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500/20 text-brand-400">
                 <Icon size={22} />
               </span>
@@ -108,7 +113,7 @@ export function TokensSection() {
               </p>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
         {/* qué determina el valor de un token */}
         <motion.div
@@ -141,24 +146,6 @@ export function TokensSection() {
               </motion.div>
             ))}
           </motion.div>
-        </motion.div>
-
-        {/* franja de inclusiones */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="mt-6 grid gap-4 rounded-2xl border border-stone-700 bg-stone-800 p-6 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {INCLUDES.map((item) => (
-            <div key={item} className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-brand-400">
-                <Check size={13} />
-              </span>
-              <span className="text-sm text-stone-200">{item}</span>
-            </div>
-          ))}
         </motion.div>
       </div>
     </section>

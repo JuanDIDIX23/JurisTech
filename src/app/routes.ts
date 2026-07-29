@@ -2,6 +2,9 @@
 
 export const ROUTES = {
   home: '/',
+  // Autenticación (públicas)
+  login: '/login',
+  register: '/registro',
   // Dashboard (área privada del afiliado)
   dashboard: '/app',
   documents: '/app/documentos',
@@ -9,4 +12,10 @@ export const ROUTES = {
   requests: '/app/solicitudes',
   requestDetail: (id = ':id') => `/app/solicitudes/${id}`,
   profile: '/app/perfil',
+  // Panel de administración
+  admin: '/admin',
+  adminLeads: '/admin/leads',
+  adminCitas: '/admin/citas',
+  adminStats: '/admin/estadisticas',
+  adminConfig: '/admin/config',
 } as const;

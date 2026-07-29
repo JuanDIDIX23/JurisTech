@@ -21,8 +21,10 @@ export const SCHEDULE_CONFIG: ScheduleConfig = {
   timezone: 'America/Bogota',
 };
 
-// Canales de contacto directo. Editable sin tocar los componentes.
-// NOTA: números y correo de prueba — reemplazar por los reales.
+// Canales de contacto directo.
+// Esto es solo el FALLBACK: en tiempo de ejecución la landing lee los valores
+// de la tabla `config` (key = 'contacto') para que el admin pueda editarlos
+// desde el panel. Ver useContactConfig().
 export interface ContactConfig {
   /** Número en formato internacional sin símbolos (para el enlace wa.me). */
   whatsappNumber: string;
@@ -32,7 +34,7 @@ export interface ContactConfig {
 }
 
 export const CONTACT_CONFIG: ContactConfig = {
-  whatsappNumber: '573000000000',
-  whatsappDisplay: '+57 300 000 0000',
-  email: 'contacto@juristech.co',
+  whatsappNumber: '573219761348',
+  whatsappDisplay: '+57 321 976 1348',
+  email: 'contacto@juristechlawyers.com',
 };

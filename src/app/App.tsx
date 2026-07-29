@@ -1,16 +1,26 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ScrollToTop } from '@app/ScrollToTop';
+import { ProtectedRoute } from '@app/components/ProtectedRoute';
 import { DashboardLayout } from '@features/dashboard/layout/DashboardLayout';
+import { AdminLayout } from '@features/admin/layout/AdminLayout';
 import { ROUTES } from '@app/routes';
+import { useAuthStore } from '@shared/store/authStore';
 
 // Code-splitting por página: la landing y el área privada se cargan aparte.
 const LandingPage = lazy(() => import('@pages/LandingPage'));
+const LoginPage = lazy(() => import('@pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('@pages/auth/RegisterPage'));
 const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
 const DocumentsPage = lazy(() => import('@pages/dashboard/DocumentsPage'));
 const TokensPage = lazy(() => import('@pages/dashboard/TokensPage'));
 const RequestsPage = lazy(() => import('@pages/dashboard/RequestsPage'));
 const ProfilePage = lazy(() => import('@pages/dashboard/ProfilePage'));
+const AdminDashboardPage = lazy(() => import('@pages/admin/AdminDashboardPage'));
+const LeadsPage = lazy(() => import('@pages/admin/LeadsPage'));
+const CitasPage = lazy(() => import('@pages/admin/CitasPage'));
+const EstadisticasPage = lazy(() => import('@pages/admin/EstadisticasPage'));
+const ConfigPage = lazy(() => import('@pages/admin/ConfigPage'));
 
 function PageFallback() {
   return (
@@ -21,6 +31,14 @@ function PageFallback() {
 }
 
 export function App() {
+  const initialize = useAuthStore((s) => s.initialize);
+
+  // Resuelve la sesión existente una sola vez, antes de que las rutas
+  // protegidas decidan si redirigen.
+  useEffect(() => {
+    void initialize();
+  }, [initialize]);
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -28,14 +46,41 @@ export function App() {
         <Routes>
           <Route path={ROUTES.home} element={<LandingPage />} />
 
-          {/* Área privada bajo /app con layout compartido */}
-          <Route path={ROUTES.dashboard} element={<DashboardLayout />}>
+          {/* Autenticación */}
+          <Route path={ROUTES.login} element={<LoginPage />} />
+          <Route path={ROUTES.register} element={<RegisterPage />} />
+
+          {/* Área privada del afiliado */}
+          <Route
+            path={ROUTES.dashboard}
+            element={
+              <ProtectedRoute requiredRole="afiliado">
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<DashboardPage />} />
             <Route path="documentos" element={<DocumentsPage />} />
             <Route path="tokens" element={<TokensPage />} />
             <Route path="solicitudes" element={<RequestsPage />} />
             <Route path="solicitudes/:id" element={<RequestsPage />} />
             <Route path="perfil" element={<ProfilePage />} />
+          </Route>
+
+          {/* Panel de administración */}
+          <Route
+            path={ROUTES.admin}
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="leads" element={<LeadsPage />} />
+            <Route path="citas" element={<CitasPage />} />
+            <Route path="estadisticas" element={<EstadisticasPage />} />
+            <Route path="config" element={<ConfigPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to={ROUTES.home} replace />} />

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   X,
@@ -12,14 +13,23 @@ import {
   MessageSquare,
   CheckCircle2,
   CalendarDays,
+  AlertCircle,
 } from 'lucide-react';
 import { Button, Input } from '@shared/ui';
 import { cn } from '@shared/lib/cn';
-import { SCHEDULE_CONFIG } from '@shared/config/schedule';
+import type { ScheduleConfig } from '@shared/config/schedule';
+import { useScheduleConfig } from '@shared/hooks/useScheduleConfig';
+import { crearCita, obtenerHorasOcupadas } from '@shared/services/citas';
 
 interface AppointmentModalProps {
   open: boolean;
   onClose: () => void;
+}
+
+interface CitaConfirmada {
+  nombre: string;
+  fechaLabel: string;
+  hora: string;
 }
 
 const WEEKDAY_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
@@ -29,6 +39,8 @@ const DAY_FORMATTER = new Intl.DateTimeFormat('es-CO', {
   day: 'numeric',
   month: 'long',
 });
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function startOfDay(date: Date): Date {
   const d = new Date(date);
@@ -47,11 +59,23 @@ function isoWeekday(date: Date): number {
   return day === 0 ? 7 : day;
 }
 
-function isDateAvailable(date: Date, today: Date): boolean {
+/**
+ * Fecha en YYYY-MM-DD usando los componentes locales.
+ * No se usa toISOString(): convierte a UTC y en Colombia (UTC-5) devolvería
+ * el día anterior para cualquier hora antes de las 19:00.
+ */
+function toISODate(date: Date): string {
+  const y = date.getFullYear();
+  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+  const d = date.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function isDateAvailable(date: Date, today: Date, schedule: ScheduleConfig): boolean {
   const day = startOfDay(date);
-  const min = addDays(startOfDay(today), SCHEDULE_CONFIG.advanceDays);
-  const max = addDays(startOfDay(today), SCHEDULE_CONFIG.maxDays);
-  return day >= min && day <= max && SCHEDULE_CONFIG.availableDays.includes(isoWeekday(day));
+  const min = addDays(startOfDay(today), schedule.advanceDays);
+  const max = addDays(startOfDay(today), schedule.maxDays);
+  return day >= min && day <= max && schedule.availableDays.includes(isoWeekday(day));
 }
 
 function buildCalendarCells(monthDate: Date): (Date | null)[] {
@@ -68,11 +92,13 @@ function buildCalendarCells(monthDate: Date): (Date | null)[] {
   return cells;
 }
 
-function generateTimeSlots(): string[] {
+function generateTimeSlots(schedule: ScheduleConfig): string[] {
   const slots: string[] = [];
-  const startMinutes = SCHEDULE_CONFIG.startHour * 60;
-  const endMinutes = SCHEDULE_CONFIG.endHour * 60;
-  for (let m = startMinutes; m + SCHEDULE_CONFIG.slotDuration <= endMinutes; m += SCHEDULE_CONFIG.slotDuration) {
+  const startMinutes = schedule.startHour * 60;
+  const endMinutes = schedule.endHour * 60;
+  const paso = schedule.slotDuration > 0 ? schedule.slotDuration : 60;
+
+  for (let m = startMinutes; m + paso <= endMinutes; m += paso) {
     const h = Math.floor(m / 60)
       .toString()
       .padStart(2, '0');
@@ -82,12 +108,15 @@ function generateTimeSlots(): string[] {
   return slots;
 }
 
-const TIME_SLOTS = generateTimeSlots();
-const CONTACT_EMAIL = 'contacto@juristech.co';
-
 export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
   const today = startOfDay(new Date());
-  const [viewMonth, setViewMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+  // El horario vive en Supabase (config.schedule) y lo edita el admin en
+  // /admin/config; SCHEDULE_CONFIG solo sirve de fallback.
+  const { schedule, loading: cargandoSchedule } = useScheduleConfig();
+  const timeSlots = useMemo(() => generateTimeSlots(schedule), [schedule]);
+  const [viewMonth, setViewMonth] = useState(
+    () => new Date(today.getFullYear(), today.getMonth(), 1),
+  );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -95,7 +124,14 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [reason, setReason] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+
+  const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
+  const [cargandoHoras, setCargandoHoras] = useState(false);
+  const [errorHoras, setErrorHoras] = useState(false);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmada, setConfirmada] = useState<CitaConfirmada | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -115,14 +151,40 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
       setEmail('');
       setPhone('');
       setReason('');
-      setSubmitted(false);
+      setHorasOcupadas([]);
+      setErrorHoras(false);
+      setError(null);
+      setConfirmada(null);
       setViewMonth(new Date(today.getFullYear(), today.getMonth(), 1));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  const cargarHoras = useCallback(async (date: Date) => {
+    setCargandoHoras(true);
+    setErrorHoras(false);
+    try {
+      const ocupadas = await obtenerHorasOcupadas(toISODate(date));
+      setHorasOcupadas(ocupadas);
+    } catch {
+      // Sin disponibilidad confirmada no se bloquea el agendamiento:
+      // se avisa y se dejan todos los slots activos.
+      setHorasOcupadas([]);
+      setErrorHoras(true);
+    } finally {
+      setCargandoHoras(false);
+    }
+  }, []);
+
+  function handleSelectDate(date: Date) {
+    setSelectedDate(date);
+    setSelectedTime(null);
+    setError(null);
+    void cargarHoras(date);
+  }
+
   const minMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  const maxDate = addDays(today, SCHEDULE_CONFIG.maxDays);
+  const maxDate = addDays(today, schedule.maxDays);
   const maxMonth = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
   const canGoPrev = viewMonth > minMonth;
   const canGoNext = viewMonth < maxMonth;
@@ -135,32 +197,48 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
     email.trim() !== '' &&
     phone.trim() !== '';
 
-  function handleSelectDate(date: Date) {
-    setSelectedDate(date);
-    setSelectedTime(null);
-  }
-
-  function buildMailto(): string {
-    const subject = 'Solicitud de cita — JurisTech';
-    const dateLabel = selectedDate ? DAY_FORMATTER.format(selectedDate) : '';
-    const bodyLines = [
-      `Nombre: ${name}`,
-      `Empresa: ${company}`,
-      `Correo: ${email}`,
-      `Teléfono: ${phone}`,
-      `Fecha solicitada: ${dateLabel}`,
-      `Hora solicitada: ${selectedTime} (hora Colombia)`,
-      `Motivo: ${reason.trim() || 'No especificado'}`,
-    ];
-    const body = bodyLines.join('\n');
-    return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }
-
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!formValid) return;
-    window.location.href = buildMailto();
-    setSubmitted(true);
+    if (!formValid || submitting || !selectedDate || !selectedTime) return;
+
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setError('El correo no tiene un formato válido.');
+      return;
+    }
+    if ((phone.match(/\d/g) ?? []).length < 7) {
+      setError('El teléfono debe tener al menos 7 dígitos.');
+      return;
+    }
+
+    setError(null);
+    setSubmitting(true);
+    try {
+      await crearCita({
+        nombre: name,
+        empresa: company,
+        telefono: phone,
+        correo: email,
+        fecha: toISODate(selectedDate),
+        hora: selectedTime,
+        motivo: reason,
+      });
+
+      setConfirmada({
+        nombre: name.trim(),
+        fechaLabel: DAY_FORMATTER.format(selectedDate),
+        hora: selectedTime,
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No pudimos agendar tu cita. Revisa tu conexión e inténtalo de nuevo.',
+      );
+      // Si la franja se ocupó mientras rellenaba, refrescamos la lista.
+      void cargarHoras(selectedDate);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -207,19 +285,33 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
             </div>
 
             <div className="overflow-y-auto px-6 py-6">
-              {submitted ? (
+              {confirmada ? (
                 <div className="flex flex-col items-center py-10 text-center">
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                     <CheckCircle2 size={28} />
                   </span>
                   <h4 className="mt-5 text-lg font-semibold text-stone-900">
-                    ¡Listo, {name.split(' ')[0]}!
+                    ¡Listo, {confirmada.nombre.split(' ')[0]}!
                   </h4>
                   <p className="mt-2 max-w-sm text-sm leading-relaxed text-stone-500">
-                    Abrimos tu cliente de correo con los datos de tu cita del{' '}
-                    {selectedDate && DAY_FORMATTER.format(selectedDate)} a las {selectedTime}. Solo
-                    confirma el envío y te contactaremos para validar el espacio.
+                    Tu cita quedó registrada. Te contactaremos para confirmarla.
                   </p>
+
+                  <dl className="mt-6 w-full max-w-sm space-y-2 rounded-2xl border border-sand-200 bg-sand-50 p-5 text-left">
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-sm text-stone-500">Fecha</dt>
+                      <dd className="text-sm font-semibold capitalize text-stone-900">
+                        {confirmada.fechaLabel}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-sm text-stone-500">Hora</dt>
+                      <dd className="text-sm font-semibold text-stone-900">
+                        {confirmada.hora} (hora Colombia)
+                      </dd>
+                    </div>
+                  </dl>
+
                   <Button className="mt-6" onClick={onClose}>
                     Cerrar
                   </Button>
@@ -238,7 +330,9 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                           type="button"
                           disabled={!canGoPrev}
                           onClick={() =>
-                            setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
+                            setViewMonth(
+                              new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1),
+                            )
                           }
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-sand-100 disabled:cursor-not-allowed disabled:opacity-30"
                         >
@@ -251,7 +345,9 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                           type="button"
                           disabled={!canGoNext}
                           onClick={() =>
-                            setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
+                            setViewMonth(
+                              new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1),
+                            )
                           }
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-sand-100 disabled:cursor-not-allowed disabled:opacity-30"
                         >
@@ -267,19 +363,22 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                       <div className="mt-1 grid grid-cols-7 gap-1">
                         {buildCalendarCells(viewMonth).map((date, i) => {
                           if (!date) return <span key={`blank-${i}`} />;
-                          const available = isDateAvailable(date, today);
+                          const available = isDateAvailable(date, today, schedule);
                           const isSelected =
-                            selectedDate && startOfDay(date).getTime() === startOfDay(selectedDate).getTime();
+                            selectedDate &&
+                            startOfDay(date).getTime() === startOfDay(selectedDate).getTime();
                           return (
                             <button
                               type="button"
                               key={date.toISOString()}
-                              disabled={!available}
+                              disabled={!available || submitting || cargandoSchedule}
                               onClick={() => handleSelectDate(date)}
                               className={cn(
                                 'flex h-9 w-9 items-center justify-center rounded-lg text-sm transition-colors',
                                 !available && 'cursor-not-allowed text-stone-300',
-                                available && !isSelected && 'text-stone-900 hover:bg-brand-50 hover:text-brand-700',
+                                available &&
+                                  !isSelected &&
+                                  'text-stone-900 hover:bg-brand-50 hover:text-brand-700',
                                 isSelected && 'bg-brand-600 font-semibold text-white',
                               )}
                             >
@@ -297,28 +396,56 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                       <Clock size={16} className="text-brand-600" />
                       2. Elige un horario
                     </h4>
-                    {selectedDate ? (
-                      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
-                        {TIME_SLOTS.map((time) => (
-                          <button
-                            type="button"
-                            key={time}
-                            onClick={() => setSelectedTime(time)}
-                            className={cn(
-                              'rounded-xl border px-3 py-2 text-sm font-medium transition-colors',
-                              selectedTime === time
-                                ? 'border-brand-600 bg-brand-600 text-white'
-                                : 'border-sand-200 text-stone-700 hover:border-brand-300 hover:bg-brand-50',
-                            )}
-                          >
-                            {time}
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
+
+                    {!selectedDate && (
                       <p className="mt-3 text-sm text-stone-400">
                         Selecciona primero una fecha disponible.
                       </p>
+                    )}
+
+                    {selectedDate && cargandoHoras && (
+                      <p className="mt-3 flex items-center gap-2 text-sm text-stone-500">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-sand-200 border-t-brand-500" />
+                        Consultando disponibilidad…
+                      </p>
+                    )}
+
+                    {selectedDate && !cargandoHoras && (
+                      <>
+                        {errorHoras && (
+                          <p className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">
+                            <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                            No pudimos verificar las horas ocupadas. Puedes continuar; confirmaremos
+                            la disponibilidad al contactarte.
+                          </p>
+                        )}
+                        <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                          {timeSlots.map((time) => {
+                            const ocupada = horasOcupadas.includes(time);
+                            const isSelected = selectedTime === time;
+                            return (
+                              <button
+                                type="button"
+                                key={time}
+                                disabled={ocupada || submitting}
+                                title={ocupada ? 'Horario no disponible' : undefined}
+                                onClick={() => setSelectedTime(time)}
+                                className={cn(
+                                  'rounded-xl border px-3 py-2 text-sm font-medium transition-colors',
+                                  ocupada &&
+                                    'cursor-not-allowed border-sand-200 bg-sand-100 text-stone-300 line-through',
+                                  !ocupada &&
+                                    !isSelected &&
+                                    'border-sand-200 text-stone-700 hover:border-brand-300 hover:bg-brand-50',
+                                  isSelected && 'border-brand-600 bg-brand-600 text-white',
+                                )}
+                              >
+                                {time}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </>
                     )}
                   </div>
 
@@ -331,6 +458,7 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                         leftIcon={<User size={16} />}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        disabled={submitting}
                         required
                       />
                       <Input
@@ -338,6 +466,7 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                         leftIcon={<Building2 size={16} />}
                         value={company}
                         onChange={(e) => setCompany(e.target.value)}
+                        disabled={submitting}
                         required
                       />
                       <Input
@@ -346,6 +475,7 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                         leftIcon={<Mail size={16} />}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={submitting}
                         required
                       />
                       <Input
@@ -354,6 +484,7 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                         leftIcon={<Phone size={16} />}
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
+                        disabled={submitting}
                         required
                       />
                       <div className="sm:col-span-2">
@@ -362,13 +493,41 @@ export function AppointmentModal({ open, onClose }: AppointmentModalProps) {
                           leftIcon={<MessageSquare size={16} />}
                           value={reason}
                           onChange={(e) => setReason(e.target.value)}
+                          disabled={submitting}
                         />
                       </div>
                     </div>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full" disabled={!formValid}>
-                    Confirmar cita
+                  {error && (
+                    <div
+                      role="alert"
+                      className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm font-medium text-rose-700"
+                    >
+                      <p>{error}</p>
+                      <button
+                        type="submit"
+                        className="mt-2 font-semibold underline underline-offset-2 hover:text-rose-900"
+                      >
+                        Reintentar
+                      </button>
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full"
+                    disabled={!formValid || submitting}
+                  >
+                    {submitting ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                        Agendando…
+                      </>
+                    ) : (
+                      'Confirmar cita'
+                    )}
                   </Button>
                 </form>
               )}

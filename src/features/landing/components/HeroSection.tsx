@@ -13,32 +13,25 @@ interface Slide {
 // generadas con IA — basta con cambiar los `src`.
 const SLIDES: Slide[] = [
   {
-    src: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1600',
-    alt: 'Sala de reunión moderna en un entorno empresarial',
+    src: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1600',
+    alt: 'Abogado firmando documentos en un entorno formal',
   },
   {
-    src: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1600',
-    alt: 'Empresario revisando documentos con control de su operación',
+    src: 'https://images.unsplash.com/photo-1521791055366-0d553872952f?w=1600',
+    alt: 'Apretón de manos profesional entre ejecutivos de traje',
   },
   {
-    src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600',
-    alt: 'Apretón de manos profesional que representa confianza',
+    src: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600',
+    alt: 'Persona firmando un contrato en una oficina',
   },
   {
-    src: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=1600',
-    alt: 'Equipo trabajando en una oficina moderna',
+    src: 'https://images.unsplash.com/photo-1664575602807-e002fc20892c?w=1600',
+    alt: 'Abogada profesional revisando documentos',
   },
   {
-    src: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1600',
-    alt: 'Profesional con laptop trabajando de forma remota',
+    src: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1600',
+    alt: 'Profesional de negocios en atuendo formal',
   },
-];
-
-const STATS = [
-  { value: '+120', label: 'pymes afiliadas' },
-  { value: '24 h', label: 'tiempo de respuesta' },
-  { value: '4', label: 'áreas jurídicas' },
-  { value: '100%', label: 'gestión remota' },
 ];
 
 const AUTOPLAY_MS = 5000;
@@ -103,35 +96,44 @@ export function HeroSection() {
             >
               <motion.span
                 variants={fadeUp}
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-brand-100 backdrop-blur"
+                className="inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-white/15 px-5 py-2.5 text-lg font-semibold text-white shadow-lg backdrop-blur sm:text-xl"
               >
-                <Sparkles size={14} />
-                Innovación jurídica para pymes colombianas
+                <Sparkles size={20} className="shrink-0 text-brand-300" />
+                Innovación y Derecho al servicio de tu empresa
               </motion.span>
 
               <motion.h1
                 variants={fadeUp}
                 className="mt-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl"
               >
-                Recupera el{' '}
+                ¿Eres empresario? Toma el{' '}
                 <span className="bg-gradient-to-r from-brand-300 to-brand-500 bg-clip-text text-transparent">
                   control
                 </span>{' '}
-                de tu inversión legal
+                de tu inversión en servicios jurídicos.
               </motion.h1>
-
+<br />
               <motion.p
                 variants={fadeUp}
-                className="mt-6 max-w-xl text-base font-normal leading-relaxed text-stone-200 sm:text-lg"
+                className="mt-6 max-w-xl text-justify text-base font-normal leading-relaxed text-stone-200 sm:text-lg"
               >
-                Olvídate de los honorarios fijos y el cobro por horas sin explicación. JurisTech es la
-                plataforma tecnológica que te da acceso a asesoría jurídica especializada mediante
-                tokens: conoces el costo antes de empezar y decides cuándo usarla.
+                Somos firma de abogados con enfoque corporativo. Innovamos para brindar una mejor
+                experiencia de asesoría y acompañamiento estratégico empresarial en materia laboral,
+                contractual y seguridad social.
+                 <br /> 
+                Olvídate de los honorarios fijos y del cobro por
+                horas sin explicación ni control. JurisTech brinda asesoría jurídica empresarial
+                mediante un sistema de tokens: conoces el costo de cada gestión antes de comenzar y
+                decides cuándo usarlos.
               </motion.p>
 
-              <motion.div variants={fadeUp} className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <motion.div variants={fadeUp} className="mt-9 flex flex-col gap-4 sm:flex-row">
                 <a href="#contacto">
-                  <Button size="lg" rightIcon={<ArrowRight size={18} />} className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    rightIcon={<ArrowRight size={20} />}
+                    className="h-14 w-full rounded-2xl px-8 text-base font-semibold sm:w-auto sm:text-lg"
+                  >
                     Agenda una asesoría
                   </Button>
                 </a>
@@ -139,7 +141,7 @@ export function HeroSection() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 sm:w-auto"
+                    className="h-14 w-full rounded-2xl border-white/25 bg-white/5 px-8 text-base font-semibold text-white hover:bg-white/10 sm:w-auto sm:text-lg"
                   >
                     Conoce nuestro modelo
                   </Button>
@@ -148,17 +150,17 @@ export function HeroSection() {
 
               <motion.p
                 variants={fadeUp}
-                className="mt-7 inline-flex items-center gap-2 text-sm font-normal text-stone-300"
+                className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-base font-semibold text-white backdrop-blur sm:text-lg"
               >
-                <ShieldCheck size={16} className="text-brand-300" />
-                Confianza y confidencialidad garantizadas
+                <ShieldCheck size={20} className="shrink-0 text-brand-300" />
+                No eres nuestro cliente, eres nuestro afiliado.
               </motion.p>
             </motion.div>
           </div>
         </div>
 
-        {/* zona inferior: dots + stats fijos */}
-        <div className="container-page w-full pb-8">
+        {/* zona inferior: indicadores del carrusel */}
+        <div className="container-page w-full pb-10">
           {/* indicadores de slide */}
           <div className="flex items-center gap-2.5" role="tablist" aria-label="Seleccionar imagen">
             {SLIDES.map((slide, i) => (
@@ -175,18 +177,6 @@ export function HeroSection() {
                     : 'h-2 w-2 rounded-full bg-white/40 transition-all duration-300 hover:bg-white/70'
                 }
               />
-            ))}
-          </div>
-
-          {/* stats fijos */}
-          <div className="mt-6 grid grid-cols-2 gap-6 border-t border-white/15 pt-6 sm:grid-cols-4">
-            {STATS.map((stat) => (
-              <div key={stat.label}>
-                <p className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-sm font-normal text-stone-300">{stat.label}</p>
-              </div>
             ))}
           </div>
         </div>

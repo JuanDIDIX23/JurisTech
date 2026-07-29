@@ -5,7 +5,6 @@ import {
   ValoresSection,
   ComparativaSection,
   TokensSection,
-  ServicesSection,
   FaqSection,
   ContactoSection,
   LandingFooter,
@@ -21,7 +20,6 @@ export default function LandingPage() {
         <ValoresSection />
         <ComparativaSection />
         <TokensSection />
-        <ServicesSection />
         <FaqSection />
         <ContactoSection />
       </main>

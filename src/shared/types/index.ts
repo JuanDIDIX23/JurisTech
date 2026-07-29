@@ -1,5 +1,7 @@
 // Tipos de dominio compartidos. Pensados para mapear 1:1 con un backend futuro.
 
+export * from './supabase';
+
 export type ID = string;
 
 export type RequestStatus = 'pending' | 'in_review' | 'in_progress' | 'completed' | 'cancelled';

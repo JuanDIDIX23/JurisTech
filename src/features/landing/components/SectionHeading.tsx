@@ -3,7 +3,7 @@ import { fadeUp } from '@shared/lib/motion';
 import { cn } from '@shared/lib/cn';
 
 interface SectionHeadingProps {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description?: string;
   align?: 'center' | 'left';
@@ -25,12 +25,15 @@ export function SectionHeading({
       viewport={{ once: true, margin: '-80px' }}
       className={cn('max-w-2xl', align === 'center' ? 'mx-auto text-center' : 'text-left')}
     >
-      <span className="text-xs font-semibold uppercase tracking-widest text-brand-600">
-        {eyebrow}
-      </span>
+      {eyebrow && (
+        <span className="text-xs font-semibold uppercase tracking-widest text-brand-600">
+          {eyebrow}
+        </span>
+      )}
       <h2
         className={cn(
-          'mt-3 text-3xl font-bold leading-snug tracking-tight',
+          'text-4xl font-bold leading-tight tracking-tight sm:text-5xl',
+          eyebrow && 'mt-3',
           tone === 'dark' ? 'text-stone-900' : 'text-white',
         )}
       >

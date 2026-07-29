@@ -10,13 +10,14 @@ import {
   Building2,
   Phone,
   ArrowUpRight,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button, Input, Select } from '@shared/ui';
 import { fadeUp } from '@shared/lib/motion';
-import { CONTACT_CONFIG } from '@shared/config/schedule';
+import { useContactConfig } from '@shared/hooks/useContactConfig';
+import { crearLead } from '@shared/services/leads';
 import { AppointmentModal } from './AppointmentModal';
 
-// Coincide con las 4 áreas de ServicesSection + "Otro".
 const HELP_OPTIONS = [
   { value: '', label: '¿En qué te podemos ayudar?' },
   { value: 'Derecho Laboral', label: 'Derecho Laboral' },
@@ -26,15 +27,17 @@ const HELP_OPTIONS = [
   { value: 'Otro', label: 'Otro' },
 ];
 
-const WHATSAPP_HREF = `https://wa.me/${CONTACT_CONFIG.whatsappNumber}?text=${encodeURIComponent(
-  'Hola JurisTech, quiero conocer más sobre la afiliación.',
-)}`;
-const EMAIL_HREF = `mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(
-  'Quiero conocer más sobre JurisTech',
-)}`;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Cuenta solo dígitos: acepta espacios, guiones o prefijo internacional. */
+function cantidadDeDigitos(valor: string): number {
+  return (valor.match(/\d/g) ?? []).length;
+}
 
 export function ContactoSection() {
+  const contacto = useContactConfig();
   const [modalOpen, setModalOpen] = useState(false);
+
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
   const [phone, setPhone] = useState('');
@@ -42,26 +45,65 @@ export function ContactoSection() {
   const [topic, setTopic] = useState('');
   const [message, setMessage] = useState('');
 
-  const formValid =
-    name.trim() !== '' && company.trim() !== '' && phone.trim() !== '' && topic !== '';
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  const whatsappHref = `https://wa.me/${contacto.whatsappNumber}?text=${encodeURIComponent(
+    'Hola, me interesa conocer más sobre JurisTech',
+  )}`;
+  const emailHref = `mailto:${contacto.email}?subject=${encodeURIComponent(
+    'Quiero conocer más sobre JurisTech',
+  )}`;
+
+  /** Devuelve el primer mensaje de validación, o null si todo es correcto. */
+  function validar(): string | null {
+    if (name.trim() === '') return 'Escribe tu nombre.';
+    if (phone.trim() === '') return 'Escribe tu teléfono.';
+    if (cantidadDeDigitos(phone) < 7) return 'El teléfono debe tener al menos 7 dígitos.';
+    if (topic === '') return 'Selecciona en qué podemos ayudarte.';
+    if (email.trim() !== '' && !EMAIL_REGEX.test(email.trim())) {
+      return 'El correo no tiene un formato válido.';
+    }
+    return null;
+  }
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!formValid) return;
-    const subject = `Nuevo contacto — ${name} (${company})`;
-    const bodyLines = [
-      `Nombre: ${name}`,
-      `Empresa: ${company}`,
-      `Teléfono: ${phone}`,
-      `Correo: ${email.trim() || 'No indicado'}`,
-      `¿En qué podemos ayudar?: ${topic}`,
-      '',
-      'Mensaje:',
-      message.trim() || 'Sin mensaje adicional.',
-    ];
-    window.location.href = `mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+    if (submitting) return;
+
+    const problema = validar();
+    if (problema) {
+      setError(problema);
+      return;
+    }
+
+    setError(null);
+    setSubmitting(true);
+    try {
+      await crearLead({
+        nombre: name,
+        empresa: company,
+        telefono: phone,
+        correo: email,
+        servicio: topic,
+        mensaje: message,
+      });
+
+      setName('');
+      setCompany('');
+      setPhone('');
+      setEmail('');
+      setTopic('');
+      setMessage('');
+      setSuccess(true);
+    } catch {
+      setError(
+        'Hubo un problema al enviar. Intenta de nuevo o escríbenos por WhatsApp.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -82,21 +124,14 @@ export function ContactoSection() {
             </div>
 
             <div className="relative">
-              <span className="text-xs font-semibold uppercase tracking-widest text-brand-300">
-                Hablemos
-              </span>
-              <h2 className="mt-3 text-3xl font-bold leading-snug tracking-tight text-white">
-                Encontremos juntos tu solución jurídica
+              <h2 className="text-3xl font-bold leading-snug tracking-tight text-white">
+                Contacto
               </h2>
-              <p className="mt-4 text-base font-normal leading-relaxed text-stone-300">
-                Cuéntanos qué necesita tu empresa. Te respondemos en menos de 24 horas y sin
-                compromiso, por el canal que prefieras.
-              </p>
 
               {/* canales directos */}
               <div className="mt-8 space-y-3">
                 <a
-                  href={WHATSAPP_HREF}
+                  href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-4 rounded-2xl border border-stone-700 bg-stone-800 p-4 transition-colors hover:border-brand-500/60"
@@ -107,7 +142,7 @@ export function ContactoSection() {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-white">WhatsApp</p>
                     <p className="text-sm font-normal text-stone-400">
-                      {CONTACT_CONFIG.whatsappDisplay}
+                      {contacto.whatsappDisplay}
                     </p>
                   </div>
                   <ArrowUpRight
@@ -117,7 +152,7 @@ export function ContactoSection() {
                 </a>
 
                 <a
-                  href={EMAIL_HREF}
+                  href={emailHref}
                   className="group flex items-center gap-4 rounded-2xl border border-stone-700 bg-stone-800 p-4 transition-colors hover:border-brand-500/60"
                 >
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500/20 text-brand-300">
@@ -125,9 +160,7 @@ export function ContactoSection() {
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-white">Correo</p>
-                    <p className="truncate text-sm font-normal text-stone-400">
-                      {CONTACT_CONFIG.email}
-                    </p>
+                    <p className="truncate text-sm font-normal text-stone-400">{contacto.email}</p>
                   </div>
                   <ArrowUpRight
                     size={18}
@@ -150,71 +183,101 @@ export function ContactoSection() {
 
           {/* columna derecha — formulario */}
           <div className="bg-white p-8 sm:p-12">
-            <h3 className="text-xl font-semibold leading-snug text-stone-900">
-              Escríbenos directamente
-            </h3>
-            <p className="mt-1.5 text-sm font-normal text-stone-500">
-              Completa el formulario y te contactamos para ayudarte.
-            </p>
+            <h3 className="text-xl font-semibold leading-snug text-stone-900">Formulario</h3>
 
-            <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-              <Input
-                placeholder="Nombre *"
-                leftIcon={<User size={16} />}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-              <Input
-                placeholder="Empresa *"
-                leftIcon={<Building2 size={16} />}
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                required
-              />
-              <Input
-                type="tel"
-                placeholder="Teléfono *"
-                leftIcon={<Phone size={16} />}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-              <Input
-                type="email"
-                placeholder="Correo (opcional)"
-                leftIcon={<Mail size={16} />}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Select
-                options={HELP_OPTIONS}
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                aria-label="¿En qué te podemos ayudar?"
-                required
-              />
-              <textarea
-                placeholder="Mensaje (opcional)"
-                rows={4}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="w-full rounded-xl border border-sand-200 bg-white px-3.5 py-2.5 text-sm font-normal text-stone-900 placeholder:text-stone-400 transition-colors focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-500/10"
-              />
+            {success ? (
+              <div className="mt-8 flex flex-col items-center py-8 text-center">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                  <CheckCircle2 size={28} />
+                </span>
+                <p className="mt-5 text-base font-semibold text-stone-900">
+                  ¡Mensaje enviado! Te contactaremos pronto.
+                </p>
+                <Button variant="outline" className="mt-6" onClick={() => setSuccess(false)}>
+                  Enviar otro mensaje
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+                <Input
+                  placeholder="Nombre *"
+                  leftIcon={<User size={16} />}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={submitting}
+                  required
+                />
+                <Input
+                  placeholder="Empresa"
+                  leftIcon={<Building2 size={16} />}
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  disabled={submitting}
+                />
+                <Input
+                  type="tel"
+                  placeholder="Teléfono *"
+                  leftIcon={<Phone size={16} />}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  disabled={submitting}
+                  required
+                />
+                <Input
+                  type="email"
+                  placeholder="Correo (opcional)"
+                  leftIcon={<Mail size={16} />}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={submitting}
+                />
+                <Select
+                  options={HELP_OPTIONS}
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  aria-label="¿En qué te podemos ayudar?"
+                  disabled={submitting}
+                  required
+                />
+                <textarea
+                  placeholder="Mensaje (opcional)"
+                  rows={4}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  disabled={submitting}
+                  className="w-full rounded-xl border border-sand-200 bg-white px-3.5 py-2.5 text-sm font-normal text-stone-900 placeholder:text-stone-400 transition-colors focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-500/10 disabled:opacity-60"
+                />
 
-              <Button
-                type="submit"
-                size="lg"
-                rightIcon={<Send size={16} />}
-                className="w-full"
-                disabled={!formValid}
-              >
-                Enviar mensaje
-              </Button>
-              <p className="text-xs font-normal text-stone-400">
-                Al enviar, se abrirá tu cliente de correo con los datos ya formateados.
-              </p>
-            </form>
+                {error && (
+                  <p
+                    role="alert"
+                    className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-sm font-medium text-rose-700"
+                  >
+                    {error}
+                  </p>
+                )}
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  rightIcon={submitting ? undefined : <Send size={16} />}
+                  className="w-full"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      Enviando…
+                    </>
+                  ) : (
+                    'Enviar mensaje'
+                  )}
+                </Button>
+                <p className="text-xs font-normal text-stone-400">
+                  Los campos marcados con * son obligatorios.
+                </p>
+              </form>
+            )}
           </div>
         </motion.div>
       </div>

@@ -8,8 +8,8 @@ import { ROUTES } from '@app/routes';
 const NAV_LINKS = [
   { label: 'Nosotros', href: '#nosotros' },
   { label: 'Tokens', href: '#tokens' },
-  { label: 'Servicios', href: '#servicios' },
   { label: 'FAQ', href: '#faq' },
+  { label: 'Contacto', href: '#contacto' },
 ];
 
 export function LandingNavbar() {

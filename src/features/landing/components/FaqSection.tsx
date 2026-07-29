@@ -13,37 +13,30 @@ const FAQS: FaqItem[] = [
   {
     question: '¿Qué significa ser afiliado de JurisTech?',
     answer:
-      'Ser afiliado significa formar parte de nuestra comunidad de pymes que acceden a servicios jurídicos preventivos y remotos mediante tokens, sin contratos de permanencia ni honorarios fijos.',
+      'No somos una firma de abogados tradicional, construimos relaciones cercanas y sólidas de largo plazo con las empresas que requieren de acompañamiento jurídico estratégico, de manera que gestionamos relaciones de confianza más allá del componente negocial.',
   },
   {
     question: '¿Qué es exactamente un token?',
     answer:
-      'Un token es una unidad de trabajo jurídico. Cada solicitud tiene un coste estimado en tokens que conoces antes de confirmarla, de modo que pagas exactamente por el trabajo que necesitas.',
+      'Es una unidad de consumo mediante la cual se descuenta el uso de los servicios jurídicos prestados por JurisTech. Su valor se determina según la naturaleza del servicio, la extensión documental, la urgencia, la complejidad técnica, la responsabilidad profesional y el alcance del entregable.',
   },
   {
     question: '¿Los tokens caducan?',
     answer:
-      'Los tokens incluidos en tu plan se mantienen disponibles mientras tu afiliación esté activa. Además, recibes bonificaciones por renovación anual.',
+      'Sí, cada bolsa de tokens tiene una vigencia durante la cual el afiliado deberá hacer uso.',
   },
   {
-    question: '¿Qué pasa si cancelo una solicitud?',
+    question: '¿Qué sucede si cancelo una solicitud?',
     answer:
-      'Si una solicitud se cancela antes de iniciarse el trabajo, los tokens reservados se reembolsan automáticamente a tu saldo.',
+      'Si una solicitud se cancela antes de iniciarse la gestión, los tokens se reembolsan automáticamente a tu bolsa.',
   },
   {
-    question: '¿Quién resuelve mis solicitudes?',
-    answer:
-      'Un equipo jurídico multidisciplinar de especialistas verificados. Cada caso se asigna al profesional adecuado según el área de especialidad.',
+    question: '¿Puedo recargar mi bolsa de tokens?',
+    answer: 'Sí, el afiliado puede recargar su bolsa en cualquier momento.',
   },
   {
-    question: '¿Cómo se protege mi información?',
-    answer:
-      'Aplicamos cifrado en tránsito, control de acceso por roles y buenas prácticas de seguridad de nivel empresarial. Tu documentación confidencial está siempre protegida.',
-  },
-  {
-    question: '¿Puedo escalar mi plan más adelante?',
-    answer:
-      'Sí. Puedes subir o bajar de plan en cualquier momento, o realizar recargas puntuales de tokens según la demanda de tu empresa.',
+    question: '¿El servicio de JurisTech exige cláusula de permanencia?',
+    answer: 'No, el afiliado puede cancelar su suscripción en cualquier momento.',
   },
 ];
 
@@ -53,11 +46,7 @@ export function FaqSection() {
   return (
     <section id="faq" className="bg-white py-24 sm:py-28">
       <div className="container-page">
-        <SectionHeading
-          eyebrow="Preguntas frecuentes"
-          title="Todo lo que necesitas saber"
-          description="¿No encuentras tu respuesta? Escríbenos y te ayudamos encantados."
-        />
+        <SectionHeading title="Preguntas frecuentes" />
 
         <div className="mx-auto mt-14 max-w-3xl divide-y divide-sand-200 border-y border-sand-200">
           {FAQS.map((faq, i) => {

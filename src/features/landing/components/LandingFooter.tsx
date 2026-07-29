@@ -8,8 +8,8 @@ const COLUMNS = [
     links: [
       { label: 'Diferenciación', href: '#comparativa' },
       { label: 'Tokens', href: '#tokens' },
-      { label: 'Servicios', href: '#servicios' },
       { label: 'Preguntas frecuentes', href: '#faq' },
+      { label: 'Contacto', href: '#contacto' },
     ],
   },
   {
