@@ -2,11 +2,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@shared/ui';
+import { cn } from '@shared/lib/cn';
 import { fadeUp, staggerContainer } from '@shared/lib/motion';
 import { getMedia } from '@shared/services/media';
 import type { Media } from '@shared/types/supabase';
 
 const AUTOPLAY_MS = 5000;
+
+/**
+ * Sombra para el texto claro que va directamente sobre la foto.
+ * Se usa `text-shadow` (no el filtro `drop-shadow`) porque actúa sobre los
+ * glifos, no crea contexto de apilamiento y es más barato de componer.
+ */
+const TEXTO_SOBRE_FOTO = '[text-shadow:0_1px_4px_rgba(0,0,0,0.8)]';
 
 export function HeroSection() {
   // Las fotos del carrusel se administran en /admin/media. Si no hay
@@ -87,13 +95,13 @@ export function HeroSection() {
         </AnimatePresence>
       )}
 
-      {/* Overlays de legibilidad. El velo plano es suave (/30) para que la
-          foto se vea; el degradado horizontal es el que oscurece la mitad
-          izquierda, que es donde va el texto. Con la foto más clara posible
-          el párrafo mantiene 5.98:1 de contraste (WCAG AA pide 4.5:1). */}
-      <div className="pointer-events-none absolute inset-0 bg-brand-950/30" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/90 via-brand-950/70 to-transparent" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950/60 via-transparent to-transparent" />
+      {/* Overlays al mínimo para que las fotos se vean al máximo. A cambio,
+          el texto claro lleva `text-shadow` (ver TEXTO_SOBRE_FOTO): con una
+          foto muy clara el contraste medido del párrafo baja de 4.5:1, así
+          que la sombra es lo que sostiene la legibilidad. */}
+      <div className="pointer-events-none absolute inset-0 bg-brand-950/10" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/60 via-brand-950/20 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950/40 via-transparent to-transparent" />
 
       {/* contenido */}
       <div className="relative z-10 flex flex-1 flex-col">
@@ -107,7 +115,10 @@ export function HeroSection() {
             >
               <motion.h1
                 variants={fadeUp}
-                className="mt-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl"
+                className={cn(
+                  'mt-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl',
+                  TEXTO_SOBRE_FOTO,
+                )}
               >
                 ¿Eres empresario? Toma el{' '}
                 <span className="bg-gradient-to-r from-brand-300 to-brand-500 bg-clip-text text-transparent">
@@ -118,7 +129,10 @@ export function HeroSection() {
               <br />
               <motion.p
                 variants={fadeUp}
-                className="mt-6 max-w-xl text-justify text-base font-normal leading-relaxed text-stone-200 sm:text-lg"
+                className={cn(
+                  'mt-6 max-w-xl text-justify text-base font-normal leading-relaxed text-white sm:text-lg',
+                  TEXTO_SOBRE_FOTO,
+                )}
               >
                 Somos una firma de abogados con enfoque corporativo. Innovamos para brindar una mejor
                 experiencia de asesoría y acompañamiento estratégico empresarial en materia laboral,
@@ -144,7 +158,7 @@ export function HeroSection() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="h-14 w-full rounded-2xl border-white/25 bg-white/5 px-8 text-base font-semibold text-white hover:bg-white/10 sm:w-auto sm:text-lg"
+                    className="h-14 w-full rounded-2xl border-white/30 bg-brand-950/40 px-8 text-base font-semibold text-white backdrop-blur hover:bg-brand-950/60 sm:w-auto sm:text-lg"
                   >
                     Conoce nuestro modelo
                   </Button>
@@ -153,7 +167,10 @@ export function HeroSection() {
 
               <motion.p
                 variants={fadeUp}
-                className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-base font-semibold text-white backdrop-blur sm:text-lg"
+                className={cn(
+                  'mt-8 inline-flex items-center gap-2.5 rounded-full border border-white/30 bg-brand-950/40 px-5 py-3 text-base font-semibold text-white backdrop-blur sm:text-lg',
+                  TEXTO_SOBRE_FOTO,
+                )}
               >
                 <ShieldCheck size={20} className="shrink-0 text-brand-300" />
                 No eres nuestro cliente, eres nuestro afiliado.
