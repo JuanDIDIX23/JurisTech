@@ -121,7 +121,10 @@ export function HeroSection() {
                 )}
               >
                 ¿Eres empresario? Toma el{' '}
-                <span className="bg-gradient-to-r from-brand-300 to-brand-500 bg-clip-text text-transparent">
+                {/* Blanco con subrayado de marca: el degradado recortado sobre
+                    el texto perdía contraste contra las fotos y, al ser el
+                    relleno transparente, la sombra se veía a través. */}
+                <span className="text-white underline decoration-brand-400 decoration-4 underline-offset-8">
                   control
                 </span>{' '}
                 de tu inversión en servicios jurídicos.
@@ -158,7 +161,9 @@ export function HeroSection() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="h-14 w-full rounded-2xl border-white/30 bg-brand-950/40 px-8 text-base font-semibold text-white backdrop-blur hover:bg-brand-950/60 sm:w-auto sm:text-lg"
+                    // El `!` es necesario: cn() concatena sin fusionar, así que
+                    // sin él ganarían `bg-white`/`text-stone-800` del variant.
+                    className="h-14 w-full rounded-2xl !border-2 !border-white !bg-transparent px-8 text-base font-semibold !text-white backdrop-blur hover:!bg-white/10 sm:w-auto sm:text-lg"
                   >
                     Conoce nuestro modelo
                   </Button>
