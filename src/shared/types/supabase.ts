@@ -159,6 +159,20 @@ export interface TokenMovement {
   created_at: string;
 }
 
+// --- Medios de la landing ----------------------------------------------
+
+export type MediaSeccion = 'hero' | 'nosotros';
+
+export interface Media {
+  id: string;
+  seccion: MediaSeccion;
+  url: string;
+  alt: string | null;
+  orden: number;
+  activo: boolean;
+  created_at: string;
+}
+
 /** Métricas del dashboard del afiliado (derivadas en cliente). */
 export interface AfiliadoStats {
   tokensDisponibles: number;

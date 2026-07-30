@@ -22,6 +22,7 @@ const LeadsPage = lazy(() => import('@pages/admin/LeadsPage'));
 const CitasPage = lazy(() => import('@pages/admin/CitasPage'));
 const AfiliadosPage = lazy(() => import('@pages/admin/AfiliadosPage'));
 const AfiliadoDetallePage = lazy(() => import('@pages/admin/AfiliadoDetallePage'));
+const MediaPage = lazy(() => import('@pages/admin/MediaPage'));
 const SolicitudesAdminPage = lazy(() => import('@pages/admin/SolicitudesAdminPage'));
 const EstadisticasPage = lazy(() => import('@pages/admin/EstadisticasPage'));
 const ConfigPage = lazy(() => import('@pages/admin/ConfigPage'));
@@ -85,6 +86,7 @@ export function App() {
             <Route path="citas" element={<CitasPage />} />
             <Route path="afiliados" element={<AfiliadosPage />} />
             <Route path="afiliados/:id" element={<AfiliadoDetallePage />} />
+            <Route path="media" element={<MediaPage />} />
             <Route path="solicitudes" element={<SolicitudesAdminPage />} />
             <Route path="estadisticas" element={<EstadisticasPage />} />
             <Route path="config" element={<ConfigPage />} />

@@ -1,10 +1,31 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Target, Eye } from 'lucide-react';
+import { Logo } from '@shared/ui';
 import { fadeUp, staggerContainer } from '@shared/lib/motion';
-
-const ABOUT_IMAGE = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800';
+import { getMedia } from '@shared/services/media';
+import type { Media } from '@shared/types/supabase';
 
 export function NosotrosSection() {
+  // La foto se administra en /admin/media (sección "nosotros").
+  const [foto, setFoto] = useState<Media | null>(null);
+
+  useEffect(() => {
+    let cancelado = false;
+
+    void getMedia('nosotros')
+      .then((data) => {
+        if (!cancelado) setFoto(data[0] ?? null);
+      })
+      .catch(() => {
+        if (!cancelado) setFoto(null);
+      });
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
   return (
     <section id="nosotros" className="bg-white py-24 sm:py-28">
       <div className="container-page">
@@ -18,12 +39,19 @@ export function NosotrosSection() {
             className="relative"
           >
             <div className="overflow-hidden rounded-3xl border border-sand-200 shadow-card">
-              <img
-                src={ABOUT_IMAGE}
-                alt="Equipo de JurisTech en un entorno de trabajo moderno"
-                className="aspect-[4/5] w-full object-cover sm:aspect-[4/3] lg:aspect-[4/5]"
-                loading="lazy"
-              />
+              {foto ? (
+                <img
+                  src={foto.url}
+                  alt={foto.alt ?? 'Equipo de JurisTech en un entorno de trabajo moderno'}
+                  className="aspect-[4/5] w-full object-cover sm:aspect-[4/3] lg:aspect-[4/5]"
+                  loading="lazy"
+                />
+              ) : (
+                // Sin foto configurada en /admin/media: marcador con la marca.
+                <div className="flex aspect-[4/5] w-full items-center justify-center bg-brand-100 sm:aspect-[4/3] lg:aspect-[4/5]">
+                  <Logo className="scale-150" />
+                </div>
+              )}
             </div>
             {/* acento decorativo */}
             <div className="pointer-events-none absolute -bottom-6 -right-6 -z-10 hidden h-40 w-40 rounded-3xl bg-brand-100 lg:block" />

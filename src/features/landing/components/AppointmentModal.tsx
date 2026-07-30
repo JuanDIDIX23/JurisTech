@@ -92,20 +92,29 @@ function buildCalendarCells(monthDate: Date): (Date | null)[] {
   return cells;
 }
 
+/**
+ * Genera los horarios recorriendo cada franja por separado. Con
+ * 9–12 y 14–16 en pasos de 60 min salen 09:00, 10:00, 11:00, 14:00 y 15:00:
+ * la pausa de almuerzo nunca aparece porque no pertenece a ninguna franja.
+ */
 function generateTimeSlots(schedule: ScheduleConfig): string[] {
-  const slots: string[] = [];
-  const startMinutes = schedule.startHour * 60;
-  const endMinutes = schedule.endHour * 60;
   const paso = schedule.slotDuration > 0 ? schedule.slotDuration : 60;
+  const slots: string[] = [];
 
-  for (let m = startMinutes; m + paso <= endMinutes; m += paso) {
-    const h = Math.floor(m / 60)
-      .toString()
-      .padStart(2, '0');
-    const mm = (m % 60).toString().padStart(2, '0');
-    slots.push(`${h}:${mm}`);
+  for (const franja of schedule.franjas) {
+    const desde = franja.inicio * 60;
+    const hasta = franja.fin * 60;
+    for (let m = desde; m + paso <= hasta; m += paso) {
+      const h = Math.floor(m / 60)
+        .toString()
+        .padStart(2, '0');
+      const mm = (m % 60).toString().padStart(2, '0');
+      slots.push(`${h}:${mm}`);
+    }
   }
-  return slots;
+
+  // Franjas solapadas o desordenadas no deben producir horarios repetidos.
+  return [...new Set(slots)].sort();
 }
 
 export function AppointmentModal({ open, onClose }: AppointmentModalProps) {

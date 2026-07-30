@@ -18,6 +18,7 @@ export const ROUTES = {
   adminCitas: '/admin/citas',
   adminAfiliados: '/admin/afiliados',
   adminAfiliadoDetalle: (id = ':id') => `/admin/afiliados/${id}`,
+  adminMedia: '/admin/media',
   adminSolicitudes: '/admin/solicitudes',
   adminStats: '/admin/estadisticas',
   adminConfig: '/admin/config',

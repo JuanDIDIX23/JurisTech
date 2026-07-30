@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Clock, Mail, MessageCircle, Save, CheckCircle2 } from 'lucide-react';
+import { Clock, Mail, MessageCircle, Save, CheckCircle2, Plus, Trash2 } from 'lucide-react';
 import { Button, Card, Input, Select } from '@shared/ui';
 import {
   esContactoConfig,
-  esScheduleConfig,
   getConfig,
+  normalizarSchedule,
   updateConfig,
 } from '@shared/services/config';
 import type { ContactoConfig } from '@shared/services/config';
 import { SCHEDULE_CONFIG } from '@shared/config/schedule';
-import type { ScheduleConfig } from '@shared/config/schedule';
+import type { Franja, ScheduleConfig } from '@shared/config/schedule';
 import { CONTACT_CONFIG } from '@shared/config/schedule';
 import { cn } from '@shared/lib/cn';
 
@@ -53,7 +53,10 @@ export default function ConfigPage() {
           getConfig('contacto'),
         ]);
         if (cancelado) return;
-        if (esScheduleConfig(rawSchedule)) setSchedule(rawSchedule);
+        // normalizarSchedule traduce el formato antiguo (startHour/endHour)
+        // al de franjas, así que guardar migra el registro sin más.
+        const normalizado = normalizarSchedule(rawSchedule);
+        if (normalizado) setSchedule(normalizado);
         if (esContactoConfig(rawContacto)) setContacto(rawContacto);
       } catch {
         if (!cancelado) setError('No se pudo cargar la configuración.');
@@ -77,6 +80,35 @@ export default function ConfigPage() {
     }));
   }
 
+  function agregarFranja() {
+    setSchedule((s) => ({ ...s, franjas: [...s.franjas, { inicio: 9, fin: 12 }] }));
+  }
+
+  function quitarFranja(indice: number) {
+    setSchedule((s) => ({ ...s, franjas: s.franjas.filter((_, i) => i !== indice) }));
+  }
+
+  function cambiarFranja(indice: number, campo: 'inicio' | 'fin', valor: number) {
+    setSchedule((s) => ({
+      ...s,
+      franjas: s.franjas.map((f, i) => (i === indice ? { ...f, [campo]: valor } : f)),
+    }));
+  }
+
+  /** Vista previa de los horarios que genera una franja. */
+  function horariosDeFranja(franja: Franja, slotDuration: number): string {
+    const paso = slotDuration > 0 ? slotDuration : 60;
+    const horas: string[] = [];
+    for (let m = franja.inicio * 60; m + paso <= franja.fin * 60; m += paso) {
+      horas.push(
+        `${Math.floor(m / 60)
+          .toString()
+          .padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`,
+      );
+    }
+    return horas.length > 0 ? horas.join(' · ') : 'Sin horarios';
+  }
+
   async function guardar(seccion: 'schedule' | 'contacto') {
     setError(null);
 
@@ -85,8 +117,15 @@ export default function ConfigPage() {
         setError('Selecciona al menos un día disponible.');
         return;
       }
-      if (schedule.endHour <= schedule.startHour) {
-        setError('La hora de fin debe ser posterior a la hora de inicio.');
+      if (schedule.franjas.length === 0) {
+        setError('Añade al menos una franja de atención.');
+        return;
+      }
+      const invalida = schedule.franjas.findIndex((f) => f.fin <= f.inicio);
+      if (invalida !== -1) {
+        setError(
+          `En la franja ${invalida + 1} la hora de fin debe ser posterior a la de inicio.`,
+        );
         return;
       }
     } else if (!/^\d{10,15}$/.test(contacto.whatsapp)) {
@@ -164,25 +203,70 @@ export default function ConfigPage() {
           </div>
         </div>
 
+        {/* franjas horarias */}
+        <div className="mt-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-medium text-stone-700">Franjas de atención</p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              leftIcon={<Plus size={14} />}
+              onClick={agregarFranja}
+            >
+              Añadir franja
+            </Button>
+          </div>
+          <p className="mt-1 text-xs text-stone-500">
+            La hora de fin es exclusiva: 9–12 genera citas a las 9:00, 10:00 y 11:00. Usa varias
+            franjas para excluir la pausa de almuerzo.
+          </p>
+
+          <div className="mt-3 space-y-2">
+            {schedule.franjas.length === 0 && (
+              <p className="rounded-xl border border-dashed border-sand-300 px-4 py-6 text-center text-sm text-stone-400">
+                Sin franjas: no se podrá agendar ninguna cita.
+              </p>
+            )}
+
+            {schedule.franjas.map((franja, i) => (
+              <div
+                key={i}
+                className="flex flex-wrap items-center gap-2 rounded-xl border border-sand-200 p-3"
+              >
+                <span className="text-sm text-stone-500">De</span>
+                <Select
+                  className="h-9 w-28 text-sm"
+                  options={HORAS}
+                  value={String(franja.inicio)}
+                  onChange={(e) => cambiarFranja(i, 'inicio', Number(e.target.value))}
+                  aria-label={`Hora de inicio de la franja ${i + 1}`}
+                />
+                <span className="text-sm text-stone-500">a</span>
+                <Select
+                  className="h-9 w-28 text-sm"
+                  options={HORAS}
+                  value={String(franja.fin)}
+                  onChange={(e) => cambiarFranja(i, 'fin', Number(e.target.value))}
+                  aria-label={`Hora de fin de la franja ${i + 1}`}
+                />
+                <span className="ml-auto text-xs text-stone-500">
+                  {horariosDeFranja(franja, schedule.slotDuration)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => quitarFranja(i)}
+                  aria-label={`Quitar franja ${i + 1}`}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-rose-600 transition-colors hover:bg-rose-50"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className="text-sm font-medium text-stone-700">Hora de inicio</span>
-            <Select
-              className="mt-1.5"
-              options={HORAS}
-              value={String(schedule.startHour)}
-              onChange={(e) => setSchedule((s) => ({ ...s, startHour: Number(e.target.value) }))}
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-stone-700">Hora de fin</span>
-            <Select
-              className="mt-1.5"
-              options={HORAS}
-              value={String(schedule.endHour)}
-              onChange={(e) => setSchedule((s) => ({ ...s, endHour: Number(e.target.value) }))}
-            />
-          </label>
           <label className="block">
             <span className="text-sm font-medium text-stone-700">Duración de cada cita</span>
             <Select

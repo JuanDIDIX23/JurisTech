@@ -108,7 +108,7 @@ export function TokensSection() {
                 <Icon size={22} />
               </span>
               <h3 className="mt-6 text-xl font-semibold leading-snug text-white">{title}</h3>
-              <p className="mt-2 text-base font-normal leading-relaxed text-stone-200">
+              <p className="mt-2 text-justify text-base font-normal leading-relaxed text-stone-200">
                 {description}
               </p>
             </motion.div>
