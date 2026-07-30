@@ -3,26 +3,9 @@ import { motion } from 'framer-motion';
 import { SectionHeading } from './SectionHeading';
 import { fadeUp, staggerContainer } from '@shared/lib/motion';
 import { getMedia } from '@shared/services/media';
-import { cn } from '@shared/lib/cn';
 import type { Media } from '@shared/types/supabase';
 
-/**
- * Columnas en pantallas grandes según cuántos logos haya. Las clases se
- * escriben completas porque Tailwind analiza el código de forma estática:
- * una clase compuesta en tiempo de ejecución nunca llegaría al CSS.
- */
-const COLUMNAS_ANCHAS: Record<number, string> = {
-  1: 'lg:grid-cols-1',
-  2: 'lg:grid-cols-2',
-  3: 'lg:grid-cols-3',
-  4: 'lg:grid-cols-4',
-};
-
 const ESQUELETOS = 5;
-
-function columnasPara(total: number): string {
-  return COLUMNAS_ANCHAS[total] ?? 'lg:grid-cols-4 xl:grid-cols-5';
-}
 
 export function AliadosSection() {
   const [logos, setLogos] = useState<Media[]>([]);
@@ -57,12 +40,12 @@ export function AliadosSection() {
         <SectionHeading eyebrow="Nuestros afiliados" title="Empresas que confían en nosotros" />
 
         {cargando ? (
-          <div className="mt-16 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="mt-16 grid grid-cols-2 justify-items-center gap-x-10 gap-y-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {Array.from({ length: ESQUELETOS }, (_, i) => (
               <div
                 key={i}
                 aria-hidden
-                className="h-[100px] animate-pulse rounded-xl border border-sand-200 bg-sand-100"
+                className="h-16 w-full max-w-[160px] animate-pulse rounded-lg bg-sand-200"
               />
             ))}
           </div>
@@ -72,22 +55,17 @@ export function AliadosSection() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: '-60px' }}
-            className={cn(
-              'mt-16 grid grid-cols-2 gap-5 sm:grid-cols-3',
-              columnasPara(logos.length),
-            )}
+            className="mt-16 grid grid-cols-2 justify-items-center gap-x-10 gap-y-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
           >
             {logos.map((logo) => (
-              <motion.li
-                key={logo.id}
-                variants={fadeUp}
-                className="flex h-[100px] items-center justify-center rounded-xl border border-sand-200 bg-white p-6 shadow-card transition-shadow duration-300 hover:shadow-glow"
-              >
+              <motion.li key={logo.id} variants={fadeUp} className="flex items-center">
+                {/* Los logos traen su propio fondo, así que van sueltos:
+                    sin tarjeta, sin borde y sin relleno alrededor. */}
                 <img
                   src={logo.url}
                   alt={logo.alt ?? 'Logo de empresa afiliada'}
                   loading="lazy"
-                  className="max-h-full max-w-full object-contain"
+                  className="h-16 w-auto max-w-[160px] object-contain"
                 />
               </motion.li>
             ))}
