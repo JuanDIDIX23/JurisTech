@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
-import type { FormEvent } from 'react';
-import { ImageOff } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { ImageOff, Upload, Link2, FileImage } from 'lucide-react';
 import { Button, Input } from '@shared/ui';
 import { ModalBase } from './ModalBase';
-import { agregarMedia } from '@shared/services/media';
+import { agregarMedia, subirImagen } from '@shared/services/media';
+import { cn } from '@shared/lib/cn';
 import type { MediaSeccion } from '@shared/types/supabase';
 
 interface AgregarMediaModalProps {
@@ -15,6 +16,16 @@ interface AgregarMediaModalProps {
   onAgregada: () => void;
 }
 
+type Origen = 'archivo' | 'url';
+
+const LIMITE_BYTES = 10 * 1024 * 1024;
+const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
+
+function formatearTamano(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function AgregarMediaModal({
   open,
   seccion,
@@ -22,15 +33,22 @@ export function AgregarMediaModal({
   onClose,
   onAgregada,
 }: AgregarMediaModalProps) {
+  const [origen, setOrigen] = useState<Origen>('archivo');
+  const [archivo, setArchivo] = useState<File | null>(null);
+  const [previewLocal, setPreviewLocal] = useState<string | null>(null);
   const [url, setUrl] = useState('');
   const [alt, setAlt] = useState('');
   const [orden, setOrden] = useState('0');
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewFalla, setPreviewFalla] = useState(false);
+  const inputArchivo = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
+      setOrigen('archivo');
+      setArchivo(null);
+      setPreviewLocal(null);
       setUrl('');
       setAlt('');
       setOrden(String(ordenSugerido));
@@ -39,26 +57,65 @@ export function AgregarMediaModal({
     }
   }, [open, ordenSugerido]);
 
+  // El object URL de la vista previa hay que liberarlo o queda en memoria.
+  useEffect(() => {
+    return () => {
+      if (previewLocal) URL.revokeObjectURL(previewLocal);
+    };
+  }, [previewLocal]);
+
   const urlValida = /^https?:\/\/.+/i.test(url.trim());
+
+  function handleArchivo(e: ChangeEvent<HTMLInputElement>) {
+    const elegido = e.target.files?.[0] ?? null;
+    if (!elegido) return;
+
+    // Se valida en cliente para dar un mensaje inmediato; el bucket
+    // aplica los mismos límites por su cuenta.
+    if (!TIPOS_PERMITIDOS.includes(elegido.type)) {
+      setError('Formato no permitido. Usa JPG, PNG, WebP, AVIF o GIF.');
+      return;
+    }
+    if (elegido.size > LIMITE_BYTES) {
+      setError(`La imagen pesa ${formatearTamano(elegido.size)} y el límite son 10 MB.`);
+      return;
+    }
+
+    if (previewLocal) URL.revokeObjectURL(previewLocal);
+    setArchivo(elegido);
+    setPreviewLocal(URL.createObjectURL(elegido));
+    setError(null);
+    if (alt.trim() === '') {
+      setAlt(elegido.name.replace(/\.[a-z0-9]+$/i, '').replace(/[-_]/g, ' '));
+    }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (enviando) return;
 
-    if (!urlValida) {
-      setError('La URL debe empezar por http:// o https://');
-      return;
-    }
     const n = Number(orden);
     if (!Number.isInteger(n)) {
       setError('El orden debe ser un número entero.');
       return;
     }
 
+    if (origen === 'archivo' && !archivo) {
+      setError('Selecciona una imagen de tu dispositivo.');
+      return;
+    }
+    if (origen === 'url' && !urlValida) {
+      setError('La URL debe empezar por http:// o https://');
+      return;
+    }
+
     setError(null);
     setEnviando(true);
     try {
-      await agregarMedia({ seccion, url, alt, orden: n });
+      const urlFinal =
+        origen === 'archivo' && archivo ? await subirImagen(seccion, archivo) : url.trim();
+
+      await agregarMedia({ seccion, url: urlFinal, alt, orden: n });
       onAgregada();
       onClose();
     } catch (err) {
@@ -67,6 +124,8 @@ export function AgregarMediaModal({
       setEnviando(false);
     }
   }
+
+  const preview = origen === 'archivo' ? previewLocal : urlValida ? url.trim() : null;
 
   return (
     <ModalBase
@@ -77,30 +136,86 @@ export function AgregarMediaModal({
       ancho="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="block">
-          <span className="text-sm font-medium text-stone-700">URL de la imagen</span>
-          <Input
-            className="mt-1.5"
-            type="url"
-            value={url}
-            onChange={(e) => {
-              setUrl(e.target.value);
-              setPreviewFalla(false);
-            }}
-            disabled={enviando}
-            placeholder="https://…"
-            required
-          />
-          <span className="mt-1.5 block text-xs text-stone-500">
-            Enlace de Supabase Storage o cualquier URL pública de imagen.
-          </span>
-        </label>
+        {/* origen de la imagen */}
+        <div className="inline-flex w-full rounded-xl border border-sand-200 bg-white p-1">
+          {(
+            [
+              { id: 'archivo' as Origen, label: 'Subir archivo', icon: Upload },
+              { id: 'url' as Origen, label: 'Pegar URL', icon: Link2 },
+            ] satisfies Array<{ id: Origen; label: string; icon: typeof Upload }>
+          ).map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              disabled={enviando}
+              onClick={() => {
+                setOrigen(id);
+                setError(null);
+              }}
+              className={cn(
+                'inline-flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50',
+                origen === id ? 'bg-brand-600 text-white' : 'text-stone-600 hover:bg-sand-100',
+              )}
+            >
+              <Icon size={15} />
+              {label}
+            </button>
+          ))}
+        </div>
 
-        {/* vista previa en vivo */}
+        {origen === 'archivo' ? (
+          <div>
+            <input
+              ref={inputArchivo}
+              type="file"
+              accept="image/*"
+              onChange={handleArchivo}
+              disabled={enviando}
+              className="sr-only"
+            />
+            <button
+              type="button"
+              onClick={() => inputArchivo.current?.click()}
+              disabled={enviando}
+              className="flex w-full items-center gap-3 rounded-xl border border-dashed border-sand-300 px-4 py-3 text-left transition-colors hover:border-brand-300 hover:bg-brand-50/40 disabled:opacity-50"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                <FileImage size={18} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium text-stone-900">
+                  {archivo ? archivo.name : 'Subir desde dispositivo'}
+                </span>
+                <span className="block text-xs text-stone-500">
+                  {archivo
+                    ? formatearTamano(archivo.size)
+                    : 'JPG, PNG, WebP, AVIF o GIF · máximo 10 MB'}
+                </span>
+              </span>
+            </button>
+          </div>
+        ) : (
+          <label className="block">
+            <span className="text-sm font-medium text-stone-700">URL de la imagen</span>
+            <Input
+              className="mt-1.5"
+              type="url"
+              value={url}
+              onChange={(e) => {
+                setUrl(e.target.value);
+                setPreviewFalla(false);
+              }}
+              disabled={enviando}
+              placeholder="https://…"
+            />
+          </label>
+        )}
+
+        {/* vista previa */}
         <div className="overflow-hidden rounded-xl border border-sand-200 bg-sand-50">
-          {urlValida && !previewFalla ? (
+          {preview && !previewFalla ? (
             <img
-              src={url.trim()}
+              src={preview}
               alt="Vista previa"
               onError={() => setPreviewFalla(true)}
               className="h-44 w-full object-cover"
@@ -114,6 +229,17 @@ export function AgregarMediaModal({
             </div>
           )}
         </div>
+
+        {/* progreso: la API de Storage no expone porcentaje, así que la
+            barra es indeterminada en vez de mostrar un avance inventado */}
+        {enviando && origen === 'archivo' && (
+          <div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-sand-100">
+              <div className="h-full w-1/3 animate-progress rounded-full bg-gradient-to-r from-brand-600 to-brand-400" />
+            </div>
+            <p className="mt-1.5 text-xs text-stone-500">Subiendo imagen…</p>
+          </div>
+        )}
 
         <label className="block">
           <span className="text-sm font-medium text-stone-700">Texto alternativo</span>

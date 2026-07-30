@@ -152,7 +152,9 @@ export default function MediaPage() {
   async function borrar(media: Media) {
     setOcupado(true);
     try {
-      await eliminarMedia(media.id);
+      // Se pasa la URL para que, si la imagen vive en el bucket,
+      // el archivo se borre junto con la fila.
+      await eliminarMedia(media.id, media.url);
       setFotos((actuales) => actuales.filter((f) => f.id !== media.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo eliminar la imagen.');

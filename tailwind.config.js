@@ -76,9 +76,16 @@ export default {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
+        // Barra de progreso indeterminada: la API de Storage no informa
+        // del porcentaje real de subida.
+        progress: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(300%)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.6s ease-out both',
+        progress: 'progress 1.2s ease-in-out infinite',
       },
     },
   },
