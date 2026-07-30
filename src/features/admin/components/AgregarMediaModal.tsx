@@ -18,6 +18,12 @@ interface AgregarMediaModalProps {
 
 type Origen = 'archivo' | 'url';
 
+const DESCRIPCION: Record<MediaSeccion, string> = {
+  hero: 'Carrusel del inicio',
+  nosotros: 'Sección «Nuestra historia»',
+  aliados: 'Logos de empresas afiliadas',
+};
+
 const LIMITE_BYTES = 10 * 1024 * 1024;
 const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
 
@@ -131,7 +137,7 @@ export function AgregarMediaModal({
     <ModalBase
       open={open}
       titulo="Agregar foto"
-      descripcion={seccion === 'hero' ? 'Carrusel del inicio' : 'Sección «Nuestra historia»'}
+      descripcion={DESCRIPCION[seccion]}
       onClose={onClose}
       ancho="lg"
     >

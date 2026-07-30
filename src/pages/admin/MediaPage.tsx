@@ -19,6 +19,12 @@ const PESTANAS: Array<{ id: MediaSeccion; label: string; ayuda: string }> = [
     ayuda:
       'Se usa la primera foto de la lista. Sin fotos, se muestra un marcador con el logo.',
   },
+  {
+    id: 'aliados',
+    label: 'Aliados (logos)',
+    ayuda:
+      'Se muestran todos en la sección «Empresas que confían en nosotros». Sin logos, esa sección no aparece en la landing.',
+  },
 ];
 
 function FilaMedia({

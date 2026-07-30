@@ -4,6 +4,7 @@ export { NosotrosSection } from './components/NosotrosSection';
 export { ValoresSection } from './components/ValoresSection';
 export { ComparativaSection } from './components/ComparativaSection';
 export { TokensSection } from './components/TokensSection';
+export { AliadosSection } from './components/AliadosSection';
 export { ServicesSection } from './components/ServicesSection';
 export { FaqSection } from './components/FaqSection';
 export { ContactoSection } from './components/ContactoSection';

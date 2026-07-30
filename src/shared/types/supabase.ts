@@ -161,7 +161,7 @@ export interface TokenMovement {
 
 // --- Medios de la landing ----------------------------------------------
 
-export type MediaSeccion = 'hero' | 'nosotros';
+export type MediaSeccion = 'hero' | 'nosotros' | 'aliados';
 
 export interface Media {
   id: string;
