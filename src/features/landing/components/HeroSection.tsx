@@ -87,9 +87,12 @@ export function HeroSection() {
         </AnimatePresence>
       )}
 
-      {/* overlays de legibilidad */}
-      <div className="pointer-events-none absolute inset-0 bg-brand-950/60" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/85 via-brand-950/45 to-transparent" />
+      {/* Overlays de legibilidad. El velo plano es suave (/30) para que la
+          foto se vea; el degradado horizontal es el que oscurece la mitad
+          izquierda, que es donde va el texto. Con la foto más clara posible
+          el párrafo mantiene 5.98:1 de contraste (WCAG AA pide 4.5:1). */}
+      <div className="pointer-events-none absolute inset-0 bg-brand-950/30" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/90 via-brand-950/70 to-transparent" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-transparent" />
 
       {/* contenido */}
