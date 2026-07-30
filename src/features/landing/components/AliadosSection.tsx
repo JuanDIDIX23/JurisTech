@@ -40,12 +40,12 @@ export function AliadosSection() {
         <SectionHeading eyebrow="Nuestros afiliados" title="Empresas que confían en nosotros" />
 
         {cargando ? (
-          <div className="mt-16 grid grid-cols-2 justify-items-center gap-x-10 gap-y-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="mt-16 flex flex-wrap justify-center gap-x-10 gap-y-8">
             {Array.from({ length: ESQUELETOS }, (_, i) => (
               <div
                 key={i}
                 aria-hidden
-                className="h-16 w-full max-w-[160px] animate-pulse rounded-lg bg-sand-200"
+                className="h-16 w-[160px] animate-pulse rounded-lg bg-sand-200"
               />
             ))}
           </div>
@@ -55,7 +55,7 @@ export function AliadosSection() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: '-60px' }}
-            className="mt-16 grid grid-cols-2 justify-items-center gap-x-10 gap-y-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+            className="mt-16 flex flex-wrap justify-center gap-x-10 gap-y-8"
           >
             {logos.map((logo) => (
               <motion.li key={logo.id} variants={fadeUp} className="flex items-center">
