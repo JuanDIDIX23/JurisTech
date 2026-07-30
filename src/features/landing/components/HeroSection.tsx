@@ -93,7 +93,7 @@ export function HeroSection() {
           el párrafo mantiene 5.98:1 de contraste (WCAG AA pide 4.5:1). */}
       <div className="pointer-events-none absolute inset-0 bg-brand-950/30" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/90 via-brand-950/70 to-transparent" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950/60 via-transparent to-transparent" />
 
       {/* contenido */}
       <div className="relative z-10 flex flex-1 flex-col">
