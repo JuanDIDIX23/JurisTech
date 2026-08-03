@@ -1,35 +1,38 @@
 import { cn } from '@shared/lib/cn';
-import logoJurisTech from '@assets/logo-juristech-transparente.png';
+import isotipo from '@assets/logo-juristech-isotipo.png';
 
 interface LogoProps {
   className?: string;
-  /**
-   * 'light' indica que el logo va sobre un fondo OSCURO.
-   *
-   * El arte oficial es azul y gris sobre transparente, así que sobre un
-   * fondo oscuro no se leería: en ese caso se le añade un respaldo claro.
-   * Lo ideal sería una versión del logo en blanco; mientras no exista,
-   * el respaldo es lo que garantiza que se vea.
-   */
+  /** 'light' = el logo va sobre un fondo oscuro (hero, overlays). */
   tone?: 'dark' | 'light';
 }
 
-/** Logo oficial. El wordmark «JURISTECH» ya viene dentro de la imagen. */
+/**
+ * Isotipo oficial + wordmark.
+ *
+ * El isotipo se acompaña del nombre en texto porque el arte no lo incluye.
+ * La imagen es decorativa (`alt=""`): quien lee con lector de pantalla ya
+ * recibe «JurisTech» del texto contiguo, y anunciarlo dos veces sobra.
+ */
 export function Logo({ className, tone = 'dark' }: LogoProps) {
   return (
-    <span
-      className={cn(
-        'inline-flex items-center',
-        tone === 'light' && 'rounded-xl bg-white/95 px-3 py-1 shadow-sm backdrop-blur',
-        className,
-      )}
-    >
+    <span className={cn('inline-flex items-center gap-2.5', className)}>
       <img
-        src={logoJurisTech}
-        alt="JurisTech"
+        src={isotipo}
+        alt=""
+        aria-hidden
         draggable={false}
-        className="h-10 w-auto select-none"
+        className="h-9 w-auto select-none"
       />
+      <span
+        className={cn(
+          'text-[17px] font-bold tracking-tight',
+          tone === 'dark' ? 'text-stone-900' : 'text-white',
+        )}
+      >
+        Juris
+        <span className={tone === 'dark' ? 'text-brand-600' : 'text-brand-300'}>Tech</span>
+      </span>
     </span>
   );
 }
