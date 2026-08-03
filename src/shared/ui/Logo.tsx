@@ -1,36 +1,35 @@
 import { cn } from '@shared/lib/cn';
+import logoJurisTech from '@assets/logo-juristech-transparente.png';
 
 interface LogoProps {
   className?: string;
-  /** color del wordmark; el isotipo siempre lleva acento */
+  /**
+   * 'light' indica que el logo va sobre un fondo OSCURO.
+   *
+   * El arte oficial es azul y gris sobre transparente, así que sobre un
+   * fondo oscuro no se leería: en ese caso se le añade un respaldo claro.
+   * Lo ideal sería una versión del logo en blanco; mientras no exista,
+   * el respaldo es lo que garantiza que se vea.
+   */
   tone?: 'dark' | 'light';
-  withWordmark?: boolean;
 }
 
-export function Logo({ className, tone = 'dark', withWordmark = true }: LogoProps) {
+/** Logo oficial. El wordmark «JURISTECH» ya viene dentro de la imagen. */
+export function Logo({ className, tone = 'dark' }: LogoProps) {
   return (
-    <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900">
-        <svg width="18" height="18" viewBox="0 0 32 32" fill="none" aria-hidden>
-          <path
-            d="M9 9h14M16 9v11a4 4 0 0 1-4 4"
-            className="stroke-brand-400"
-            strokeWidth="2.6"
-            strokeLinecap="round"
-          />
-          <circle cx="22" cy="20" r="2.4" className="fill-brand-300" />
-        </svg>
-      </span>
-      {withWordmark && (
-        <span
-          className={cn(
-            'text-[17px] font-bold tracking-tight',
-            tone === 'dark' ? 'text-stone-900' : 'text-white',
-          )}
-        >
-          Juris<span className="text-brand-500">Tech</span>
-        </span>
+    <span
+      className={cn(
+        'inline-flex items-center',
+        tone === 'light' && 'rounded-xl bg-white/95 px-3 py-1 shadow-sm backdrop-blur',
+        className,
       )}
+    >
+      <img
+        src={logoJurisTech}
+        alt="JurisTech"
+        draggable={false}
+        className="h-10 w-auto select-none"
+      />
     </span>
   );
 }
